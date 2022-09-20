@@ -19,4 +19,8 @@ for i = 2:nstep
 endfor
 plot(t,u1); hold on; plot(t,u2,'r'); plot(t,u3,'k'); 
 plot(t,uex,'b', 'linewidt',3);
+h = legend({'Forward Euler', 'Backward Euler', 'Trapezoidal Rule', 'Analytical'}, 
+'Location', 'northeast')
+legend(h)
 set(gca, 'fontsize', 24, 'lindewidt', 2);
+hold off
