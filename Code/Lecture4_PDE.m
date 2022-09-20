@@ -5,7 +5,7 @@ clear;
 clc;
 
 % Discretization
-m = 300;
+m = 100;
 h = 1 / m;
 x = h * (1:m)';
 
