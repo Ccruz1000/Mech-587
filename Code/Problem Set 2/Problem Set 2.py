@@ -51,8 +51,6 @@ import os
 # Path to save files
 current_path = os.getcwd()
 plot_folder = current_path + '/plots'
-if not os.path.exists(plot_folder):
-    os.makedirs(plot_folder, exist_ok=True)
 
 def burgers(numx, dom_len, tfinal, tinitial, dt):
     dx = dom_len / (numx - 1)  # Spatial step size
@@ -69,6 +67,7 @@ def burgers(numx, dom_len, tfinal, tinitial, dt):
         #  Solve initial point for periodic boundary condition
         u[j, n + 1] = (dt * nu / dx ** 2) * (u[j + 1, n] - 2 * u[j, n] + u[-1, n]) \
                       - (dt / 2 * dx) * u[j, n] * (u[j + 1, n] - u[-1, n]) + u[j, n]
+        u[-1, n+1] = u[j, n + 1]
 
         for j in range(1, numx - 1):
             #  Solve solution vector
@@ -80,18 +79,22 @@ def burgers(numx, dom_len, tfinal, tinitial, dt):
     plt.title("Question 3 Problem Set 2, dt=%g, Number of grid points=%i" % (dt, numx))
     plt.xlabel("Position X")
     plt.ylabel("Solution U")
-    plt.savefig(plot_folder + '/dt=%g_Numx=%i' % (dt, numx) + '.png')
+    save_folder = plot_folder + '_Num_X=%i' % numx
+    if not os.path.exists(save_folder):
+        os.makedirs(save_folder, exist_ok=True)
+    plt.savefig(save_folder + '/dt=%g_Numx=%i' % (dt, numx) + '.png')
     plt.close()
     # plt.show()
 
-numx = [40]  # Number of discretization points
+numx = [20, 40]  # Number of discretization points
 dom_len = 1.0  # Domain size
-dt = np.arange(5e-3, 5e-1, 1e-2)
-print(len(dt))
+# dt = np.linspace(5e-3, 5e-1, 20)
+dt = np.arange(5e-3, 5e-1 + 5e-3, 5e-3)
 # dt = 5e-3  # Time step
 tfinal = 1.0
 tinitial = 0.0
 # burgers(20, 1, 1, 0, 0.5)
 for t in dt:
     for num in numx:
+        print(t, numx)
         burgers(num, dom_len, tfinal, tinitial, t)
