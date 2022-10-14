@@ -59,17 +59,9 @@ def burgers(numx, dom_len, tfinal, tinitial, dt):
 
 numx = [20, 40]  # Number of discretization points
 dom_len = 1.0  # Domain size
-# dt = np.linspace(5e-3, 5e-1, 20)
 dt = np.arange(5e-3, 4e-2 + 5e-3, 1e-3)
-# dt = [5e-3]  # Time step
 tfinal = 1.0
 tinitial = 0.0
-# x_vec, u_vec = burgers(numx[0], dom_len, tfinal, tinitial, 5e-3)
-# z = (len(u_vec[0, :]))
-# for i in range(len(u_vec[0, :])):
-#     if i % 10 == 0:
-#         plt.plot(x_vec, u_vec[:, i])
-# plt.show()
 for t in dt:
     for num in numx:
         print(t, num)
