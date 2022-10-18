@@ -221,7 +221,7 @@ void computeDiffusion(Vector &R, const Vector &u, const Grid &G)
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++)
 			// Computed using central differencing method for both X and Y spatial derivative
-			R(i,j) = (((u(i-1, j) - (2 * u(i, j)) + u(i+1, j)) / (dx * dx)) + ((u(i, j-1) - (2 * u(i, j)) + u(i, j+1)) / (dy * dy));
+			R(i,j) = (((u(i-1, j) - (2 * u(i, j)) + u(i+1, j)) / (dx * dx)) + ((u(i, j-1) - (2 * u(i, j)) + u(i, j+1)) / (dy * dy)));
 
 }
 
