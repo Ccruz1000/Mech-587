@@ -101,6 +101,12 @@ void initializeU(Vector &u, const Grid &G)
 
 void computeMatrix(Matrix &M, const Grid &G)
 {
+			/*
+			 *=====================================================================
+			 *Added boundary conditions based on whats given in steady
+			 *=====================================================================
+			*/
+
 	unsigned long i,j;
 	const double dx = G.dx();
 	const double dy = G.dy();
@@ -110,11 +116,11 @@ void computeMatrix(Matrix &M, const Grid &G)
 
 	for(i = 1; i < G.Nx()-1; i++)
 		for(j = 1; j < G.Ny()-1; j++){
-			M(i,j,0) = -1.0*(3*dy)/dx;
-			M(i,j,1) = dy;
-			M(i,j,3) = 0.0;
-			M(i,j,4) = 0.0;
-			M(i,j,2) = 1.0;
+			M(i,j,0) = (1 / (dx * dx));
+			M(i,j,1) = (1 / (dy * dy));
+			M(i,j,2) = ((-2 / (dx * dx)) - (2 / (dy * dy)));
+			M(i,j,3) = (1 / (dy * dy));
+			M(i,j,4) = (1 / (dx * dx));
 		}
 
 	for(i = 0; i < G.Nx(); i++)
@@ -141,7 +147,12 @@ void computeMatrix(Matrix &M, const Grid &G)
 */
 
 void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
-{
+{			
+			/*
+			 *=====================================================================
+			 *Added boundary conditions based on whats given in transient
+			 *=====================================================================
+			*/
 	unsigned long i,j;
 	const double dx = G.dx();
 	const double dy = G.dy();
@@ -153,11 +164,16 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 	
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++) {
-			M(i,j,0) = 0;
-			M(i,j,1) = 0;
-			M(i,j,3) = 0;
-			M(i,j,4) = 0;
-			M(i,j,2) = dx*(dy-dt)/dt;
+			/*
+			Boundary conditions the same here, but with the difference (I/dt - 0.5 * A)
+			I is 1 along the diagnol, and 0 everywhere else. Therefore if the current position is not along the diagnol I/dt becomes 0, 
+			and if it is, it becomes 1/dt. Only M(i, j, 2) is along the diagnol.
+			*/
+			M(i,j,0) = -0.5 * (1 / (dx * dx));;
+			M(i,j,1) = -0.5 * (1 / (dy * dy));
+			M(i,j,2) = ((1 / dt) - (0.5 * (-2 / (dx * dx)) - (2 / (dy * dy))));
+			M(i,j,3) = -0.5 * (1 / (dy * dy));
+			M(i,j,4) = -0.5 * (1 / (dx * dx));
 		}
 
 	for(i = 0; i < Nx; i++)
@@ -211,17 +227,19 @@ void applyBC(Vector &R, Vector &du, const Grid &G)
 	const double a = 0.3;
 
 	for(i = 0; i < Nx; i++){
+		// Bottom Boundary
 		j = 0;
 		R(i,j) = du(i,j) = a;
-
+		// Top boundary
 		j = Ny-1;
 		R(i,j) = du(i,j) = a;
 	}
 
 	for(j = 0; j < Ny; j++){
+		// Left Boundary 
 		i = 0;
 		R(i,j) = du(i,j) = a;
-
+		// Right boundary 
 		j = Ny-1;
 		R(i,j) = du(i,j) = a;
 	}
