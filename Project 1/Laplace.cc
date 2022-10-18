@@ -111,8 +111,14 @@ void computeMatrix(Matrix &M, const Grid &G)
 	const double dx = G.dx();
 	const double dy = G.dy();
 
-	const double a = 0.3;
-	const double b = 0.5;
+	const double a = 1.0;
+	const double b = 0.0;
+
+	/* 
+	 *a is 1.0 as M(i, j, 2) is the value that solves the point we are looking at. Along the
+	 *boundary, this is 0. Seen in denotation for sparse matrix
+	*/ 
+
 
 	for(i = 1; i < G.Nx()-1; i++)
 		for(j = 1; j < G.Ny()-1; j++){
@@ -125,14 +131,14 @@ void computeMatrix(Matrix &M, const Grid &G)
 
 	for(i = 0; i < G.Nx(); i++)
 		for(int t = 0; t < 5; t++){
-			M(i,0,t) = (t == 2 ? a : b);
-			M(i,G.Ny()-1, t) = (t == 2 ? a : b);
+			M(i,0,t) = (t == 2 ? a : b);  // Bottom boundary
+			M(i,G.Ny()-1, t) = (t == 2 ? a : b);  // Top boundary
 		}
 
 	for(j = 0; j < G.Ny(); j++)
 		for(int t = 0; t < 5; t++){
-			M(0,j,t) = (t == 2 ? a : b);
-			M(G.Nx()-1,j,t) = (t == 2 ? a : b);
+			M(0,j,t) = (t == 2 ? a : b);  // Left Boundary
+			M(G.Nx()-1,j,t) = (t == 2 ? a : b);  // Right Boundary
 		}
 }
 
@@ -159,9 +165,14 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 	unsigned long Nx, Ny;
 	Nx = G.Nx(), Ny = G.Ny();
 
-	const double a = 0.3;
-	const double b = 0.5;
+	const double a = 1.0;
+	const double b = 0.0;
 	
+	/* 
+	 *a is 1.0 as M(i, j, 2) is the value that solves the point we are looking at. Along the
+	 *boundary, this is 0. Seen in denotation for sparse matrix
+	*/ 
+
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++) {
 			/*
@@ -200,6 +211,7 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 
 void computeDiffusion(Vector &R, const Vector &u, const Grid &G)
 {
+	// Added boundary condition calculated using Central Differencing method
 	unsigned long i,j;
 	unsigned long Nx = G.Nx();
 	unsigned long Ny = G.Ny();
@@ -208,7 +220,8 @@ void computeDiffusion(Vector &R, const Vector &u, const Grid &G)
 
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++)
-			R(i,j) = u(i+1,j) / (dx) + u(i,j+1) / (dy);
+			// Computed using central differencing method for both X and Y spatial derivative
+			R(i,j) = (((u(i-1, j) - (2 * u(i, j)) + u(i+1, j)) / (dx * dx)) + ((u(i, j-1) - (2 * u(i, j)) + u(i, j+1)) / (dy * dy));
 
 }
 
@@ -224,7 +237,9 @@ void applyBC(Vector &R, Vector &du, const Grid &G)
 	unsigned long Nx = G.Nx();
 	unsigned long Ny = G.Ny();
 
-	const double a = 0.3;
+	const double a = 0.0;
+	// The above value is a as we have a Dirichlet boundary condition which remains as a constant value. Therefore we don't 
+	// need to apply the boundary conditions again. 
 
 	for(i = 0; i < Nx; i++){
 		// Bottom Boundary
