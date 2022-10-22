@@ -1,0 +1,38 @@
+ccruz1000@ccruz1000-VirtualBox:~/Documents/Mech-587/Project 1/Trapezoidal$ ./Trapezoidal 
+Initial Residual Norm = 1.594832891076e+02
+Gauss Seidel Iterations converged
+iterations = 117, Error Residuals = 7.217454458485e-09
+Time-Step = 1
+Residual Norm = 1.591558956398e+02,
+ Residual Norm Ratio (R/R0) = 9.979471613009e-01
+Gauss Seidel Iterations converged
+iterations = 120, Error Residuals = 9.778643536212e-09
+Time-Step = 2
+Residual Norm = 1.588308221838e+02,
+ Residual Norm Ratio (R/R0) = 9.959088696539e-01
+Gauss Seidel Iterations converged
+iterations = 120, Error Residuals = 9.735936548391e-09
+Time-Step = 3
+Residual Norm = 1.585080168844e+02,
+ Residual Norm Ratio (R/R0) = 9.938847999145e-01
+Gauss Seidel Iterations converged
+iterations = 120, Error Residuals = 9.693740391844e-09
+Time-Step = 4
+Residual Norm = 1.581874300849e+02,
+ Residual Norm Ratio (R/R0) = 9.918746407233e-01
+Gauss Seidel Iterations converged
+iterations = 120, Error Residuals = 9.652052590261e-09
+Time-Step = 5
+Residual Norm = 1.578690141972e+02,
+ Residual Norm Ratio (R/R0) = 9.898780936899e-01
+Transient Solution time = 1.023300000000e-02
+Initial Residual Norm = 1.594832891076e+02
+Gauss Seidel Iterations converged
+iterations = 117, Error Residuals = 6.970184113305e-09
+Outer Iteration = 1
+Residual Norm = 7.508357122517e-09,
+ Residual Norm Ratio (R/R0) = 4.707927184430e-11
+Steady-state Solution time = 2.031000000000e-03
+Transient Solution Error = 5.835808975454e-01
+Steady Solution Error = 6.048073324687e-04
+Difference Error (L2, Linf) = 5.837537483191e-01, 3.048524173857e+00 at (15, 15)
