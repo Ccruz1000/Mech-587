@@ -1,0 +1,210 @@
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 453
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 454
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 455
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 456
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 457
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 458
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 459
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 460
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 461
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 462
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 463
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 464
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 465
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 466
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 467
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 468
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 469
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 470
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 471
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 472
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 473
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 474
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 475
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 476
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 477
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 478
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 479
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 480
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 481
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 482
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 483
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 484
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 485
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 486
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 487
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 488
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 489
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 490
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 491
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 492
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 493
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan
+Gauss Seidel Iterations converged
+iterations = 50001, Error Residuals =           -nan
+Time-Step = 494
+Residual Norm =           -nan,
+ Residual Norm Ratio (R/R0) =           -nan

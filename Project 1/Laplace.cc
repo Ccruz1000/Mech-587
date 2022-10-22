@@ -122,11 +122,11 @@ void computeMatrix(Matrix &M, const Grid &G)
 
 	for(i = 1; i < G.Nx()-1; i++)
 		for(j = 1; j < G.Ny()-1; j++){
-			M(i,j,0) = (1 / (dx * dx));
-			M(i,j,1) = (1 / (dy * dy));
-			M(i,j,2) = ((-2 / (dx * dx)) - (2 / (dy * dy)));
-			M(i,j,3) = (1 / (dy * dy));
-			M(i,j,4) = (1 / (dx * dx));
+			M(i,j,0) = -1.0 * (3 * dy) / dx;
+			M(i,j,1) = dy;
+			M(i,j,2) = 0.0;
+			M(i,j,3) = 0.0;
+			M(i,j,4) = 1.0;
 		}
 
 	for(i = 0; i < G.Nx(); i++)

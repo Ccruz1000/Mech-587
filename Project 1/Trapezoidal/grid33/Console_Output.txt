@@ -1,0 +1,54 @@
+Time-Step = 193
+Residual Norm = 3.382071596195e+01,
+ Residual Norm Ratio (R/R0) = 7.367112184039e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.885500100657e-09
+Time-Step = 194
+Residual Norm = 3.346425980160e+01,
+ Residual Norm Ratio (R/R0) = 7.289465911709e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.819749140460e-09
+Time-Step = 195
+Residual Norm = 3.311203392829e+01,
+ Residual Norm Ratio (R/R0) = 7.212741116004e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.754842680622e-09
+Time-Step = 196
+Residual Norm = 3.276398194338e+01,
+ Residual Norm Ratio (R/R0) = 7.136925511698e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.690771336696e-09
+Time-Step = 197
+Residual Norm = 3.242004830230e+01,
+ Residual Norm Ratio (R/R0) = 7.062006999606e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.627520159002e-09
+Time-Step = 198
+Residual Norm = 3.208017829954e+01,
+ Residual Norm Ratio (R/R0) = 6.987973663318e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.565076956363e-09
+Time-Step = 199
+Residual Norm = 3.174431805397e+01,
+ Residual Norm Ratio (R/R0) = 6.914813765992e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.503433572760e-09
+Time-Step = 200
+Residual Norm = 3.141241449441e+01,
+ Residual Norm Ratio (R/R0) = 6.842515747220e-02
+Gauss Seidel Iterations converged
+iterations = 129, Error Residuals = 5.442576574232e-09
+Time-Step = 201
+Residual Norm = 3.108441534559e+01,
+ Residual Norm Ratio (R/R0) = 6.771068219960e-02
+Transient Solution time = 1.706840000000e+00
+Initial Residual Norm = 4.590769777501e+02
+Gauss Seidel Iterations converged
+iterations = 211, Error Residuals = 9.884860972827e-09
+Outer Iteration = 1
+Residual Norm = 1.127181289699e-09,
+ Residual Norm Ratio (R/R0) = 2.455320881530e-12
+Steady-state Solution time = 1.361900000000e-02
+Transient Solution Error = 8.406694076520e-03
+Steady Solution Error = 1.561666503124e-04
+Difference Error (L2, Linf) = 8.405279487602e-03, 1.712910683109e-01 at (31, 31)

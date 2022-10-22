@@ -122,11 +122,11 @@ void computeMatrix(Matrix &M, const Grid &G)
 
 	for(i = 1; i < G.Nx()-1; i++)
 		for(j = 1; j < G.Ny()-1; j++){
-			M(i,j,0) = (1 / (dx * dx));
-			M(i,j,1) = (1 / (dy * dy));
-			M(i,j,2) = ((-2 / (dx * dx)) - (2 / (dy * dy)));
-			M(i,j,3) = (1 / (dy * dy));
-			M(i,j,4) = (1 / (dx * dx));
+			M(i,j,0) = 1.0 / (dx * dx);
+			M(i,j,1) = 1.0 / (dy * dy);
+			M(i,j,2) = - 2.0 / (dx * dx) - 2.0 / (dy * dy);
+			M(i,j,3) = 1.0 / (dy * dy);
+			M(i,j,4) = 1.0 / (dx * dx);
 		}
 
 	for(i = 0; i < G.Nx(); i++)
@@ -182,7 +182,7 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 			*/
 			M(i,j,0) = -0.5 * (1 / (dx * dx));;
 			M(i,j,1) = -0.5 * (1 / (dy * dy));
-			M(i,j,2) = ((1 / dt) - (0.5 * (-2 / (dx * dx)) - (2 / (dy * dy))));
+			M(i,j,2) = (1 / dt) - 0.5 * (- 2 / (dx * dx) - 2 / (dy * dy));
 			M(i,j,3) = -0.5 * (1 / (dy * dy));
 			M(i,j,4) = -0.5 * (1 / (dx * dx));
 		}
