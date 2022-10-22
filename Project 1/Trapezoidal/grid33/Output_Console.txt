@@ -1,0 +1,70 @@
+Time-Step = 190
+Residual Norm = 1.048478339649e-01,
+ Residual Norm Ratio (R/R0) = 2.283883510752e-04
+Gauss Seidel Iterations converged
+iterations = 71, Error Residuals = 9.568525589446e-09
+Time-Step = 191
+Residual Norm = 1.028659875265e-01,
+ Residual Norm Ratio (R/R0) = 2.240713268406e-04
+Gauss Seidel Iterations converged
+iterations = 71, Error Residuals = 9.370054274532e-09
+Time-Step = 192
+Residual Norm = 1.009216450304e-01,
+ Residual Norm Ratio (R/R0) = 2.198359968409e-04
+Gauss Seidel Iterations converged
+iterations = 71, Error Residuals = 9.176167457270e-09
+Time-Step = 193
+Residual Norm = 9.901409362288e-02,
+ Residual Norm Ratio (R/R0) = 2.156808082778e-04
+Gauss Seidel Iterations converged
+iterations = 71, Error Residuals = 8.986738805583e-09
+Time-Step = 194
+Residual Norm = 9.714263422920e-02,
+ Residual Norm Ratio (R/R0) = 2.116042383682e-04
+Gauss Seidel Iterations converged
+iterations = 71, Error Residuals = 8.801646277549e-09
+Time-Step = 195
+Residual Norm = 9.530658127092e-02,
+ Residual Norm Ratio (R/R0) = 2.076047937276e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 9.863451342811e-09
+Time-Step = 196
+Residual Norm = 9.350526238967e-02,
+ Residual Norm Ratio (R/R0) = 2.036810097686e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 9.661203593205e-09
+Time-Step = 197
+Residual Norm = 9.173801817790e-02,
+ Residual Norm Ratio (R/R0) = 1.998314501143e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 9.463525463478e-09
+Time-Step = 198
+Residual Norm = 9.000420191607e-02,
+ Residual Norm Ratio (R/R0) = 1.960547060259e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 9.270295100957e-09
+Time-Step = 199
+Residual Norm = 8.830317931611e-02,
+ Residual Norm Ratio (R/R0) = 1.923493958440e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 9.081394659688e-09
+Time-Step = 200
+Residual Norm = 8.663432827105e-02,
+ Residual Norm Ratio (R/R0) = 1.887141644428e-04
+Gauss Seidel Iterations converged
+iterations = 70, Error Residuals = 8.896710151904e-09
+Time-Step = 201
+Residual Norm = 8.499703861043e-02,
+ Residual Norm Ratio (R/R0) = 1.851476826980e-04
+Transient Solution time = 1.166424000000e+00
+Initial Residual Norm = 4.590769777501e+02
+Gauss Seidel Iterations converged
+iterations = 211, Error Residuals = 9.884860972827e-09
+Outer Iteration = 1
+Residual Norm = 1.127181289699e-09,
+ Residual Norm Ratio (R/R0) = 2.455320881530e-12
+Steady-state Solution time = 1.357000000000e-02
+Transient Solution Error = 4.464638350081e-03
+Steady Solution Error = 1.561666503124e-04
+Difference Error (L2, Linf) = 4.309193872863e-03, 8.887605581788e-03 at (16, 16)
+
