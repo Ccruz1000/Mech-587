@@ -52,3 +52,8 @@ Steady-state Solution time = 2.509090000000e-01
 Transient Solution Error = 5.110222471132e-02
 Steady Solution Error = 3.966651043739e-05
 Difference Error (L2, Linf) = 5.110221551252e-02, 1.226885377585e+00 at (63, 63)
+
+real	0m21.720s
+user	0m21.701s
+sys	0m0.012s
+
