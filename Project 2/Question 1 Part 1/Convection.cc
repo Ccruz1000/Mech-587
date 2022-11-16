@@ -20,7 +20,23 @@ double f0(double x, double y)
 }
 /*================================================================================================*/
 
-void InitializePhi(Vector &phi, const Grid &G);
+void InitializePhi(Vector &phi, const Grid &G)
+{
+	unsigned long i, j;	// Initialize for counters
+	double x, y;  // Initalize position
+	// Declare grid variables to use in initialization of vector
+	const unsigned long Nx = G.Nx();
+	const unsigned long Ny = G.Ny();
+	const double dx = G.dx();
+	const double dy = G.dy();
+	// Initialize Phi vector
+	for(i=0; i < Nx; i++)
+		for(j=0; j < Ny; j++)
+		{
+			x = i * dx, y = j * dy;
+			phi(i,j) = f0(x, y);
+		}
+}
 void InitializeVel(Vector &u, Vector &v, const Grid &G);
 
 /*================================================================================================
@@ -74,7 +90,7 @@ double f0(double x, double y){
 	return 0;
 }
 */
-
+/*
 void InitializePhi(Vector &phi, const Grid &G)
 {
 	const size_t Nx = G.Nx();
@@ -86,7 +102,7 @@ void InitializePhi(Vector &phi, const Grid &G)
 		for(j = 0; j < Ny; j++)
 			phi(i,j) = f0(G.x(i), G.y(j));
 }
-
+*/
 void InitializeVel(Vector &u, Vector &v, const Grid &G)
 {
 	const size_t Nx = G.Nx();
