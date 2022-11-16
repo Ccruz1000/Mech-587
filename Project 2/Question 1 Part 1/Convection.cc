@@ -22,7 +22,7 @@ double f0(double x, double y)
 
 void InitializePhi(Vector &phi, const Grid &G)
 {
-	unsigned long i, j;	// Initialize for counters
+	unsigned long i, j;	// Initialize for loop counters
 	double x, y;  // Initalize position
 	// Declare grid variables to use in initialization of vector
 	const unsigned long Nx = G.Nx();
@@ -37,7 +37,28 @@ void InitializePhi(Vector &phi, const Grid &G)
 			phi(i,j) = f0(x, y);
 		}
 }
-void InitializeVel(Vector &u, Vector &v, const Grid &G);
+void InitializeVel(Vector &u, Vector &v, const Grid &G)
+{
+	unsigned long i, j; // Initialize for loop counters
+	double x, y; // Initialize position 
+	// Declare grid variables to use in initialization of vector
+	const unsigned long Nx = G.Nx();
+	const unsigned long Ny = G.Ny();
+	const double dx = G.dx();
+	const double dy = G.dy();
+	// Initialize velocity vectors
+	for(i=0; i < Nx; i++)
+	{
+		x = i * dx;
+		v(i) = -x; 
+	}
+	for(j=0; j<Ny; j++)
+	{
+		y = j * dy;
+		u(i) = y;
+	}
+
+}
 
 /*================================================================================================
  * Correct the initialization function for the 2D convection diffusion equation f1 
@@ -103,6 +124,7 @@ void InitializePhi(Vector &phi, const Grid &G)
 			phi(i,j) = f0(G.x(i), G.y(j));
 }
 */
+/*
 void InitializeVel(Vector &u, Vector &v, const Grid &G)
 {
 	const size_t Nx = G.Nx();
@@ -117,7 +139,7 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G)
 			v(i,j) = -G.x(i);
 		}
 }
-
+*/
 double f1(double x, double y){
 	return 0;
 }
