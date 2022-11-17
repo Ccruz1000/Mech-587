@@ -14,12 +14,53 @@
  * Correct the initialization function for the 2D convection equation f0
  *================================================================================================
  */
+double f0(double x, double y);
+
+void InitializePhi(Vector &phi, const Grid &G);
+void InitializeVel(Vector &u, Vector &v, const Grid &G);
+
+/*================================================================================================
+ * Correct the initialization function for the 2D convection diffusion equation f1 
+ * pay attention to boundary values (use the value from the boundary condition)
+ *================================================================================================
+ */
+
+double f1(double x, double y);
+
+/*================================================================================================*/
+
+void InitializePhiCD(Vector &phi, const Grid &G);
+void InitializeVelCD(Vector &u, Vector &v, const Grid &G);
+
+
+void FOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
+void CDS2(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
+void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
+/*================================================================================================*/
+
+
+
+void eulerExp(Vector &phi, const Vector &fc_Curr, double &dt);
+void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &dt);
+/*================================================================================================*/
+
+
+void SolveConvection(const Grid &G, const double tf, double dt, const unsigned short scheme);
+
+/*================================================================================================
+ * Complete the function for solving convection diffusion equation
+ * Variables which might be useful for you has been define inside the function
+ *================================================================================================
+ */
+void SolveConvectionDiffusion(const Grid &G, double tf, double dt, const unsigned short scheme);
+/*================================================================================================*/
+
+
+
 double f0(double x, double y)
 {
 	return 5.0 * exp(-1500.0 * (pow((x - 0.25), 2) + pow(y, 2))); // Initial condition for phi
-}
-/*================================================================================================*/
-
+}	
 void InitializePhi(Vector &phi, const Grid &G)
 {
 	unsigned long i, j;	// Initialize for loop counters
@@ -55,91 +96,9 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G)
 	for(j=0; j<Ny; j++)
 	{
 		y = j * dy;
-		u(i) = y;
+		u(j) = y;
 	}
-
 }
-
-/*================================================================================================
- * Correct the initialization function for the 2D convection diffusion equation f1 
- * pay attention to boundary values (use the value from the boundary condition)
- *================================================================================================
- */
-double f1(double x, double y);
-/*================================================================================================*/
-
-void InitializePhiCD(Vector &phi, const Grid &G);
-void InitializeVelCD(Vector &u, Vector &v, const Grid &G);
-
-/*================================================================================================
- * Complete the function for applying convective operator
- * (1) first order upwind (FOU)
- * (2) central difference (CDS2)
- * (3) second order upwind (SOU)
- *================================================================================================
- */
-void FOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
-void CDS2(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
-void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G);
-/*================================================================================================*/
-
-
-/*================================================================================================
- * Complete the function for time-integration
- * (1) forward Euler (eulerExp)
- * (2) Adams-Bashforth second order (ab2Exp)
- *================================================================================================
- */
-void eulerExp(Vector &phi, const Vector &fc_Curr, double &dt);
-void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &dt);
-/*================================================================================================*/
-
-
-void SolveConvection(const Grid &G, const double tf, double dt, const unsigned short scheme);
-
-/*================================================================================================
- * Complete the function for solving convection diffusion equation
- * Variables which might be useful for you has been define inside the function
- *================================================================================================
- */
-void SolveConvectionDiffusion(const Grid &G, double tf, double dt, const unsigned short scheme);
-/*================================================================================================*/
-
-
-/*
-double f0(double x, double y){
-	return 0;
-}
-*/
-/*
-void InitializePhi(Vector &phi, const Grid &G)
-{
-	const size_t Nx = G.Nx();
-	const size_t Ny = G.Ny();
-	unsigned long i,j;
-	double x,y;
-
-	for(i = 0; i < Nx; i++)
-		for(j = 0; j < Ny; j++)
-			phi(i,j) = f0(G.x(i), G.y(j));
-}
-*/
-/*
-void InitializeVel(Vector &u, Vector &v, const Grid &G)
-{
-	const size_t Nx = G.Nx();
-	const size_t Ny = G.Ny();
-
-	unsigned long i, j;
-	double x,y;
-
-	for(i = 0; i < Nx; i++)
-		for(j = 0; j < Ny; j++){
-			u(i,j) = G.y(j);
-			v(i,j) = -G.x(i);
-		}
-}
-*/
 double f1(double x, double y){
 	return 0;
 }
@@ -169,9 +128,28 @@ void InitializeVelCD(Vector &u, Vector &v, const Grid &G)
 			v(i,j) = 0.05;
 		}
 }
-
+/*================================================================================================
+ * Complete the function for applying convective operator
+ * (1) first order upwind (FOU)
+ * (2) central difference (CDS2)
+ * (3) second order upwind (SOU)
+ *================================================================================================
+ */
 void FOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G)
 {
+	unsigned long i, j;
+	const double dx = G.dx();
+	const double dy = G.dy();
+    // Describe interior nodes
+	for(i = 1; i < G.Nx() - 1; i++)
+		for(j = 1; j < G.Ny() - 1; j++)
+		{
+			fc_Curr(i,j) = (-u(i) / (2 * dx) - abs(u(i)) / (2 * dx)) * phi(i - 1, j) + 
+			(-v(j) / (2 * dy) - abs(v(j)) / (2 * dy)) * phi(i, j - 1) +
+			(abs(u(i)) / dx + abs(v(j)) / dy) * phi(i, j) + 
+			(u(i) / (2 * dx) - abs(u(i)) / (2 * dx)) * phi(i + 1, j) +
+			(-v(j) / (2 * dy) - abs(v(j)) / (2 * dy)) * phi(i, j + 1);
+		}
 
 }
 
@@ -185,7 +163,12 @@ void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, c
 
 
 }
-
+/*================================================================================================
+ * Complete the function for time-integration
+ * (1) forward Euler (eulerExp)
+ * (2) Adams-Bashforth second order (ab2Exp)
+ *================================================================================================
+ */
 void eulerExp(Vector &phi, const Vector &fc_Curr, double &dt)
 {
 
