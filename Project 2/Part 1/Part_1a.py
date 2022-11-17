@@ -1,18 +1,33 @@
 # Import Packages
 import numpy as np
 import matplotlib.pyplot as plt
-import math
+
 
 # User Defined Functions
 
 # Initialize
-num_div = 30  # Number of divisions in x and y
-# phi = 5.0*exp(-1500 * ((x - 0.25) ** 2 + y ** 2))  # Plotted equation
-x = np.linspace(-1, 1, num_div)
-y = np.linspace(-1, 1, num_div)
-sol = np.zeros((num_div, num_div))
+num_div = 100  # Number of divisions
+x_list = np.linspace(-1.0, 1.0, num_div)  # x coordinates
+y_list = np.linspace(-1.0, 1.0, num_div)  # y coordinates
+x, y = np.meshgrid(x_list, y_list)  # Mesh
+# Calculate phi
+phi = 5.0 * np.exp(-1500.0 * ((x - 0.25) ** 2 + y ** 2))  # Initial phi
+# plt.contourf(x_list, y_list, phi)
 
-# Solve
-for i in range(num_div - 1):
-    for j in range(num_div - 1):
-        sol[i][j] = 5.0 * math.exp(-1500 * ((x[i] - 0.25) ** 2 + y[j] ** 2))
+# Not sure what b wants, either do velocity = u + v or do velocity = sqrt(u^2 + v^2)
+# ask
+
+# Magnitude
+u = y
+v = -x
+vel = np.sqrt(u ** 2 + v ** 2)
+plt.contourf(x_list, y_list, vel)
+# Adding
+velocity = -x + y
+# plt.contourf(x_list, y_list, velocity)
+
+# Show plot
+plt.xlabel('X')
+plt.ylabel('Y')
+plt.title('Phi')
+plt.show()
