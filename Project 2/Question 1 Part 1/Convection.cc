@@ -90,19 +90,9 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G)
 			v(i, j) = -G.x(i);
 			u(i, j) = G.y(j);
 		}
-		/*
-		x = i * dx;
-		v(i) = -x; 
-	}
-	for(j=0; j<Ny; j++)
-	{
-		y = j * dy;
-		u(j) = y;
-	}
-	    */
 }
 double f1(double x, double y){
-	return 0;
+	return 1.0 * exp(-1500 * (pow((x - 0.5), 2) + pow((y - 0.5), 2)));  //Initial condition for phi
 }
 
 void InitializePhiCD(Vector &phi, const Grid &G)
@@ -137,7 +127,7 @@ void InitializeVelCD(Vector &u, Vector &v, const Grid &G)
  * (3) second order upwind (SOU)
  *================================================================================================
  */
-void FOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G)
+void FOU(Vector &f_Curr, const Vector &phi, const Vector &u, const Vector &v, const Grid &G)
 {
 	unsigned long i, j;
 	const double dx = G.dx();
@@ -173,7 +163,14 @@ void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, c
  */
 void eulerExp(Vector &phi, const Vector &fc_Curr, double &dt)
 {
+	unsigned long i, j;
+/*
+	for(i = 0; i < G.Nx(); i++)
+		for(j = 0; j < G.Ny(); j++)
+		{
 
+		}
+*/
 }
 
 void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &dt)
