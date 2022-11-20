@@ -315,8 +315,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 int main()
 {
 	// method and problem
-	unsigned short conScheme = 2;
-	unsigned short timeScheme = 1;
+	unsigned short conScheme = 3;
+	unsigned short timeScheme = 2;
 	unsigned short pbtype = 1;
 
 	switch (conScheme){
@@ -340,7 +340,7 @@ int main()
 		double ylim1[2] = {-1, 1};
 		Nx1 = Ny1 = 201;
 		double tf1 = 2*PI;
-		double dt1 = 0.2*2/200;
+		double dt1 = 0.05*2/200;
 		// dt1 originally 0.05*2/200
 		Grid G1(Nx1,Ny1,xlim1,ylim1);
 		SolveConvection(G1, tf1, dt1, conScheme, timeScheme);
