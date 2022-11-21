@@ -61,7 +61,7 @@ void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &
 
 // Declare functions from project 1 code 
 void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt);
-void computeDiffusion(Vector &R, const Vector &u, const Grid &G);
+void computeDiffusion(Vector &R, Vector &phi, const Grid &G, double alpha, Vector &fc_Curr, Vector &fc_Prev, double &dt, Vector &u, Vector &v, int itime);
 void applyBC(Vector &R, Vector &du, const Grid &G);
 void initializePhie(Vector &phie, const Grid &G);
 
@@ -299,20 +299,29 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 		}
 }
 
-void computeDiffusion(Vector &R, const Vector &phi, const Grid &G, double alpha)
+void computeDiffusion(Vector &R, Vector &phi, const Grid &G, double alpha, Vector &fc_Curr, Vector &fc_Prev, double &dt, Vector &u, Vector &v, int itime)
 {
-	// Added boundary condition calculated using Central Differencing method
+	// Added boundary condition calculated using Central Differencing method for diffusion
+	// Computer convection terms using central central difference for space and adams bashforth for time
 	unsigned long i,j;
 	unsigned long Nx = G.Nx();
 	unsigned long Ny = G.Ny();
 	double dx = G.dx();
 	double dy = G.dy();
 
+	// Initialize vector to calculate values for convective solution to phi
+	Vector phi_conv(Nx, Ny);
+	phi_conv = phi;
+	CDS2(fc_Curr, phi_conv, u, v, G); // Central difference for space
+	itime < 1 ? eulerExp(phi, fc_Curr, dt) : abs2Exp(phi, fc_Curr, fc_Prev, dt);
+
+
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++)
 			// Computed using central differencing method for both X and Y spatial derivative
 			R(i,j) = alpha * (((phi(i-1, j) - (2 * phi(i, j)) + phi(i+1, j)) / (dx * dx)) + ((phi(i, j-1) - (2 * phi(i, j)) + phi(i, j+1)) / (dy * dy)));
-
+	// Add convective term to residual
+	R = R + phi_conv;
 }
 
 void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, double alpha)
@@ -423,12 +432,10 @@ void SolveConvection(const Grid &G, const double tf, double dt, const unsigned s
 
 void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const unsigned short conScheme, const unsigned short timeScheme, const double alpha)
 {
-
 	const size_t Nx = G.Nx();
-	const size_t Ny = G.Ny();
-	
+	const size_t Ny = G.Ny();;
+
 	Vector phi(Nx, Ny);
-	Vector phi_conv(Nx, Ny); // Temporary vector to store convection phi values
 	Vector u(Nx, Ny);
 	Vector v(Nx, Ny);
 	Matrix A(Nx,Ny); // LHS matrix A
@@ -438,68 +445,33 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	Vector R(Nx,Ny); // Residual R
 	Vector id(Nx,Ny); // residual from implicite diffusion Aphi^n in the previous project
 	Vector dphi(Nx,Ny); // Increment dphi
-		
+	int itime = 0;
+	double R0 = 0.0;
 
-	//Initialize A, Phi, phi_conv and Vel
+	//Initialize A, Phi and Vel
 	computeTransientMatrix(A, G, dt);
 	InitializePhiCD(phi, G);
-	InitializePhiCD(phi_conv, G);
 	InitializeVelCD(u, v, G);
 
-	// Compute diffusion and residual norm 
-	computeDiffusion(id, phi, G, alpha);
-	R = id - phi_conv;  // Update residual to subtract convective solution
+	// Compute diffusion and residual norm
+	computeDiffusion(R, phi, G, alpha, fc_Curr, fc_Prev, dt, u, v, itime);
 	applyBC(R, phi, G, u, v, alpha);
-	double R0 = 0.0;
 	R0 = R.L2Norm();
-	printf("Initial Residual Norm %14.12e\n", R0);
-	printf("Original dphi norm %14.12e\n", dphi.L2Norm());
+	printf("Initial residual norm %14.12e\n", R0);
 
-	// Start time loop 
-	int itime = 0;
-
-    while(itime * dt <= tf)
+	// Start time loop
+	while(itime * dt <= tf)
 	{
-		// Record previous convection vector 
 		fc_Prev = fc_Curr;
-
-		// calculate the convection vector at the current time step
-		switch(conScheme)
-		{
-			case 1:
-				FOU(fc_Curr, phi_conv, u, v, G);
-				break;
-			case 2:
-				CDS2(fc_Curr, phi_conv, u, v, G);
-				break;
-			case 3:
-				SOU(fc_Curr, phi_conv, u, v, G);
-				break;
-			default:
-				printf("invalid convection scheme.\n");
-				exit(0);
-		}
-		switch(timeScheme)
-		{
-			case 1:
-				eulerExp(phi_conv, fc_Curr, dt);
-				break;
-			case 2:
-				itime < 1 ? eulerExp(phi_conv, fc_Curr, dt) : abs2Exp(phi_conv, fc_Curr, fc_Prev, dt);
-				break;
-			default:
-				printf("invalid time-integration scheme.\n");
-				exit(0);
-		}
-		R = id - phi_conv;  // Update resiudal
 		// Solve the linear system Adphi = -R
 		solveGS(dphi, A, R);
-		// Update the solution
+
+		// Update the solution phi
 		phi = phi + dphi;
-		// Compute residual 
-		computeDiffusion(id, phi, G, alpha);
-		R = id - phi_conv;
-		applyBC(R, phi, G, u, v, alpha);
+
+		// Compute the residual
+		computeDiffusion(R, phi, G, alpha, fc_Curr, fc_Prev, dt, u, v, itime);
+		applyBC(R, dphi, G, u, v, alpha);
 		double R1 = R.L2Norm();
 
 		printf("Time-Step = %d\n",++itime); 
@@ -516,6 +488,101 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	char fname[20] = "Phi_2.vtk";
 	storeVTKStructured(phi, G, fname);
 }
+// void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const unsigned short conScheme, const unsigned short timeScheme, const double alpha)
+// {
+
+// 	const size_t Nx = G.Nx();
+// 	const size_t Ny = G.Ny();
+	
+// 	Vector phi(Nx, Ny);
+// 	Vector phi_conv(Nx, Ny); // Temporary vector to store convection phi values
+// 	Vector u(Nx, Ny);
+// 	Vector v(Nx, Ny);
+// 	Matrix A(Nx,Ny); // LHS matrix A
+// 	// forward convection current and previous
+// 	Vector fc_Curr(Nx,Ny);
+// 	Vector fc_Prev(Nx,Ny);
+// 	Vector R(Nx,Ny); // Residual R
+// 	Vector id(Nx,Ny); // residual from implicite diffusion Aphi^n in the previous project
+// 	Vector dphi(Nx,Ny); // Increment dphi
+		
+
+// 	//Initialize A, Phi, phi_conv and Vel
+// 	computeTransientMatrix(A, G, dt);
+// 	InitializePhiCD(phi, G);
+// 	InitializePhiCD(phi_conv, G);
+// 	InitializeVelCD(u, v, G);
+
+// 	// Compute diffusion and residual norm 
+// 	computeDiffusion(id, phi, G, alpha);
+// 	R = id - phi_conv;  // Update residual to subtract convective solution
+// 	applyBC(R, phi, G, u, v, alpha);
+// 	double R0 = 0.0;
+// 	R0 = R.L2Norm();
+// 	printf("Initial Residual Norm %14.12e\n", R0);
+// 	printf("Original dphi norm %14.12e\n", dphi.L2Norm());
+
+// 	// Start time loop 
+// 	int itime = 0;
+
+//     while(itime * dt <= tf)
+// 	{
+// 		// Record previous convection vector 
+// 		fc_Prev = fc_Curr;
+
+// 		// calculate the convection vector at the current time step
+// 		switch(conScheme)
+// 		{
+// 			case 1:
+// 				FOU(fc_Curr, phi_conv, u, v, G);
+// 				break;
+// 			case 2:
+// 				CDS2(fc_Curr, phi_conv, u, v, G);
+// 				break;
+// 			case 3:
+// 				SOU(fc_Curr, phi_conv, u, v, G);
+// 				break;
+// 			default:
+// 				printf("invalid convection scheme.\n");
+// 				exit(0);
+// 		}
+// 		switch(timeScheme)
+// 		{
+// 			case 1:
+// 				eulerExp(phi_conv, fc_Curr, dt);
+// 				break;
+// 			case 2:
+// 				itime < 1 ? eulerExp(phi_conv, fc_Curr, dt) : abs2Exp(phi_conv, fc_Curr, fc_Prev, dt);
+// 				break;
+// 			default:
+// 				printf("invalid time-integration scheme.\n");
+// 				exit(0);
+// 		}
+// 		R = id + phi_conv;  // Update resiudal
+// 		// Solve the linear system Adphi = -R
+// 		solveGS(dphi, A, R);
+// 		// Update the solution
+// 		phi = phi + dphi;
+// 		// Compute residual 
+// 		computeDiffusion(id, phi, G, alpha);
+// 		R = id + phi_conv;
+// 		applyBC(R, phi, G, u, v, alpha);
+// 		double R1 = R.L2Norm();
+
+// 		printf("Time-Step = %d\n",++itime); 
+// 		//printf("Residual Norm = %14.12e,\n Residual Norm Ratio (R/R0) = %14.12e\n", R1, R1/R0);
+// 		printf("Convergence Criteria %12.12e\n Current Time = %lf\n", dphi.L2Norm(), itime*dt);
+// 		//Check convergence
+// 		if(dphi.L2Norm() < 1e-8)
+// 		{
+// 			printf("Steady state reached in %d time steps.\n Final time = %lf.\n",itime,itime*dt);
+// 			break;
+// 		}
+// 		// Compute R
+// 	}
+// 	char fname[20] = "Phi_2.vtk";
+// 	storeVTKStructured(phi, G, fname);
+// }
 
 
 
@@ -524,8 +591,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 int main()
 {
 	// method and problem
-	unsigned short conScheme = 1;
-	unsigned short timeScheme = 1;
+	unsigned short conScheme = 3;
+	unsigned short timeScheme = 2;
 	unsigned short pbtype = 2;
 
 	switch (conScheme){
