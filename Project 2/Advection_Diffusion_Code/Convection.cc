@@ -462,6 +462,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	{
 		// Record previous convection vector 
 		fc_Prev = fc_Curr;
+		//phi_conv = phi;
 
 		// calculate the convection vector at the current time step
 		switch(conScheme)
@@ -491,7 +492,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 				printf("invalid time-integration scheme.\n");
 				exit(0);
 		}
-		R = id - phi_conv;  // Update resiudal
+		//R = id - phi_conv;  // Update resiudal
 		// Solve the linear system Adphi = -R
 		solveGS(dphi, A, R);
 		// Update the solution
@@ -501,6 +502,11 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		R = id - phi_conv;
 		applyBC(R, phi, G, u, v, alpha);
 		double R1 = R.L2Norm();
+		//phi_conv = phi;
+		/*
+		FINALLY FOUND BUG! phi_conv is never updated, and therefore we arent updating as we timestep.
+		Find a way to update phi_conv properly, and easy fix!!
+		*/
 
 		printf("Time-Step = %d\n",++itime); 
 		//printf("Residual Norm = %14.12e,\n Residual Norm Ratio (R/R0) = %14.12e\n", R1, R1/R0);
@@ -524,8 +530,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 int main()
 {
 	// method and problem
-	unsigned short conScheme = 1;
-	unsigned short timeScheme = 1;
+	unsigned short conScheme = 2;
+	unsigned short timeScheme = 2;
 	unsigned short pbtype = 2;
 
 	switch (conScheme){
@@ -565,7 +571,7 @@ int main()
 		Nx2 = Ny2 = 17;
 		// Define Problem
 		double tf2 = 2*PI;
-		double dt2 = 0.01*2/200;
+		double dt2 = 0.05*2/200;
 		double alpha = 0.1;
 		// Initialize and solve
 		Grid G2(Nx2,Ny2,xlim2,ylim2);
