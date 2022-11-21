@@ -468,13 +468,13 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		switch(conScheme)
 		{
 			case 1:
-				FOU(fc_Curr, phi_conv, u, v, G);
+				FOU(fc_Curr, phi, u, v, G);
 				break;
 			case 2:
-				CDS2(fc_Curr, phi_conv, u, v, G);
+				CDS2(fc_Curr, phi, u, v, G);
 				break;
 			case 3:
-				SOU(fc_Curr, phi_conv, u, v, G);
+				SOU(fc_Curr, phi, u, v, G);
 				break;
 			default:
 				printf("invalid convection scheme.\n");
@@ -483,23 +483,25 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		switch(timeScheme)
 		{
 			case 1:
-				eulerExp(phi_conv, fc_Curr, dt);
+				eulerExp(phi, fc_Curr, dt);
 				break;
 			case 2:
-				itime < 1 ? eulerExp(phi_conv, fc_Curr, dt) : abs2Exp(phi_conv, fc_Curr, fc_Prev, dt);
+				itime < 1 ? eulerExp(phi, fc_Curr, dt) : abs2Exp(phi, fc_Curr, fc_Prev, dt);
 				break;
 			default:
 				printf("invalid time-integration scheme.\n");
 				exit(0);
 		}
 		//R = id - phi_conv;  // Update resiudal
+		R = id + fc_Curr;
 		// Solve the linear system Adphi = -R
 		solveGS(dphi, A, R);
 		// Update the solution
 		phi = phi + dphi;
 		// Compute residual 
 		computeDiffusion(id, phi, G, alpha);
-		R = id - phi_conv;
+		//R = id - phi_conv;
+		R = id + fc_Curr;
 		applyBC(R, phi, G, u, v, alpha);
 		double R1 = R.L2Norm();
 		//phi_conv = phi;
@@ -568,10 +570,10 @@ int main()
 		unsigned long Nx2, Ny2;
 		double xlim2[2] = {0, 1};
 		double ylim2[2] = {0, 1};
-		Nx2 = Ny2 = 17;
+		Nx2 = Ny2 = 65;
 		// Define Problem
 		double tf2 = 2*PI;
-		double dt2 = 0.05*2/200;
+		double dt2 = 0.01*2/200;
 		double alpha = 0.1;
 		// Initialize and solve
 		Grid G2(Nx2,Ny2,xlim2,ylim2);
