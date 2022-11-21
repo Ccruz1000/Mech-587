@@ -338,17 +338,17 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		// Left boundary
 		i = 0;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Right boundary
 		i = Nx - 1;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 }
 
@@ -493,7 +493,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 				exit(0);
 		}
 		//R = id - phi_conv;  // Update resiudal
-		R = id + fc_Curr;
+		R = 0.5 * id + fc_Curr;
 		// Solve the linear system Adphi = -R
 		solveGS(dphi, A, R);
 		// Update the solution
@@ -501,7 +501,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		// Compute residual 
 		computeDiffusion(id, phi, G, alpha);
 		//R = id - phi_conv;
-		R = id + fc_Curr;
+		//R = 0.5 * id - fc_Curr;
 		applyBC(R, phi, G, u, v, alpha);
 		double R1 = R.L2Norm();
 		//phi_conv = phi;
@@ -570,7 +570,7 @@ int main()
 		unsigned long Nx2, Ny2;
 		double xlim2[2] = {0, 1};
 		double ylim2[2] = {0, 1};
-		Nx2 = Ny2 = 65;
+		Nx2 = Ny2 = 17;
 		// Define Problem
 		double tf2 = 2*PI;
 		double dt2 = 0.01*2/200;
