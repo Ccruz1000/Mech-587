@@ -1,5 +1,10 @@
 #include "Base.h"
 
+//TODO - Update initializephicd to include the boundary conditions properly 
+//(The equation given does not include 0 and 1 so use boundary condition)
+//TODO Neuman Boundary conditions
+//
+
 
 /*================================================================================================
  * The current code can be compiled successfully without modification with Base.h and Base.cc.
@@ -31,6 +36,7 @@ double f1(double x, double y);
 void InitializePhiCD(Vector &phi, const Grid &G);
 void InitializeVelCD(Vector &u, Vector &v, const Grid &G);
 
+
 /*================================================================================================
  * Complete the function for applying convective operator
  * (1) first order upwind (FOU)
@@ -53,6 +59,11 @@ void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, c
 void eulerExp(Vector &phi, const Vector &fc_Curr, double &dt);
 void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &dt);
 /*================================================================================================*/
+
+// Declare functions from project 1 code 
+void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt);
+void computeDiffusion(Vector &R, const Vector &u, const Grid &G);
+void applyBC(Vector &R, Vector &du, const Grid &G);
 
 
 void SolveConvection(const Grid &G, const double tf, double dt, const unsigned short scheme);
@@ -209,6 +220,102 @@ void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &
 	phi = phi - dt * (1.5 * fc_Curr - 0.5 * fc_Prev);
 }
 
+// Add code from project 1
+void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
+{			
+			/*
+			 *=====================================================================
+			 *Added boundary conditions based on whats given in transient
+			 *=====================================================================
+			*/
+	unsigned long i,j;
+	const double dx = G.dx();
+	const double dy = G.dy();
+	unsigned long Nx, Ny;
+	Nx = G.Nx(), Ny = G.Ny();
+
+	const double a = 1.0;
+	const double b = 0.0;
+	
+	/* 
+	 *a is 1.0 as M(i, j, 2) is the value that solves the point we are looking at. Along the
+	 *boundary, this is 0. Seen in denotation for sparse matrix
+	*/ 
+
+	for(i = 1; i < Nx-1; i++)
+		for(j = 1; j < Ny-1; j++) {
+			/*
+			Boundary conditions the same here, but with the difference (I/dt - 0.5 * A)
+			I is 1 along the diagnol, and 0 everywhere else. Therefore if the current position is not along the diagnol I/dt becomes 0, 
+			and if it is, it becomes 1/dt. Only M(i, j, 2) is along the diagnol.
+			*/
+			M(i,j,0) = -0.5 * (1 / (dx * dx));;
+			M(i,j,1) = -0.5 * (1 / (dy * dy));
+			M(i,j,2) = (1 / dt) - 0.5 * (- 2 / (dx * dx) - 2 / (dy * dy));
+			M(i,j,3) = -0.5 * (1 / (dy * dy));
+			M(i,j,4) = -0.5 * (1 / (dx * dx));
+		}
+
+	for(i = 0; i < Nx; i++)
+		for(int t = 0; t < 5; t++){
+			M(i,0,t) = (t == 2 ? a : b);
+			M(i,Ny-1, t) = (t == 2 ? a : b);
+		}
+
+	for(j = 0; j < Ny; j++)
+		for(int t = 0; t < 5; t++){
+			M(0,j,t) = (t == 2 ? a : b);
+			M(Nx-1,j,t) = (t == 2 ? a : b);
+		}
+}
+
+void computeDiffusion(Vector &R, const Vector &phi, const Grid &G, double alpha)
+{
+	// Added boundary condition calculated using Central Differencing method
+	unsigned long i,j;
+	unsigned long Nx = G.Nx();
+	unsigned long Ny = G.Ny();
+	double dx = G.dx();
+	double dy = G.dy();
+
+	for(i = 1; i < Nx-1; i++)
+		for(j = 1; j < Ny-1; j++)
+			// Computed using central differencing method for both X and Y spatial derivative
+			R(i,j) = alpha * (((phi(i-1, j) - (2 * phi(i, j)) + phi(i+1, j)) / (dx * dx)) + ((phi(i, j-1) - (2 * phi(i, j)) + phi(i, j+1)) / (dy * dy)));
+
+}
+
+void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, double alpha)
+{
+	unsigned long i,j;
+	unsigned long Nx = G.Nx();
+	unsigned long Ny = G.Ny();
+
+	// Apply given exact solution to top and bottom until I can figure out Neuman
+	for(i = 0; i < Nx; i ++)
+	{
+		// Bottom Boundary
+		j = 0;
+		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		// Top Boundary 
+		j = 1;
+		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+	}
+	// Apply Dirichlet boundary condition to left and right
+	for(j = 0; j < Ny; j++)
+	{
+		// Left boundary
+		i = 0;
+		R(i, j) = dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+
+		// Right boundary
+		i = 1;
+		R(i, j) = dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+	}
+}
+
 void SolveConvection(const Grid &G, const double tf, double dt, const unsigned short conScheme, const unsigned short timeScheme)
 {
 	const size_t Nx = G.Nx();
@@ -282,30 +389,95 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 
 	const size_t Nx = G.Nx();
 	const size_t Ny = G.Ny();
+	double alpha = 1.0; // Diffusion constant 
 	
 	Vector phi(Nx, Ny);
+	Vector phi_conv(Nx, Ny); // Temporary vector to store convection phi values
 	Vector u(Nx, Ny);
 	Vector v(Nx, Ny);
-
-	InitializePhiCD(phi,G);
-	InitializeVelCD(u,v,G);
-
-	// variables needed for Newton-Raphson iteration
-	// LHS matrix A
-	Matrix A(Nx,Ny);
-	// Residual R
-	Vector R(Nx,Ny);
-	// Increment dphi
-	Vector dphi(Nx,Ny);
-	
-	// variables needed for calculating the residual
+	Matrix A(Nx,Ny); // LHS matrix A
 	// forward convection current and previous
 	Vector fc_Curr(Nx,Ny);
 	Vector fc_Prev(Nx,Ny);
-	// residual from implicite diffusion Aphi^n in the previous project
-	Vector id(Nx,Ny);
+	Vector R(Nx,Ny); // Residual R
+	Vector id(Nx,Ny); // residual from implicite diffusion Aphi^n in the previous project
+	Vector dphi(Nx,Ny); // Increment dphi
+		
 
-	
+	//Initialize A, Phi, phi_conv and Vel
+	computeTransientMatrix(A, G, dt);
+	InitializePhiCD(phi, G);
+	InitializePhiCD(phi_conv, G);
+	InitializeVelCD(u, v, G);
+
+	// Compute diffusion and residual norm 
+	computeDiffusion(id, phi, G, alpha);
+	R = id - phi_conv;  // Update residual to subtract convective solution
+	applyBC(R, phi, G, u, v, alpha);
+	double R0 = 0.0;
+	R0 = R.L2Norm();
+	printf("Initial Residual Norm %14.12e\n", R0);
+
+	// Start time loop 
+	int itime = 0;
+
+	while(itime * dt <= tf)
+	{
+		// Record previous convection vector 
+		fc_Prev = fc_Curr;
+
+		// calculate the convection vector at the current time step
+		switch(conScheme)
+		{
+			case 1:
+				FOU(fc_Curr, phi_conv, u, v, G);
+				break;
+			case 2:
+				CDS2(fc_Curr, phi_conv, u, v, G);
+				break;
+			case 3:
+				SOU(fc_Curr, phi_conv, u, v, G);
+				break;
+			default:
+				printf("invalid convection scheme.\n");
+				exit(0);
+		}
+		switch(timeScheme)
+		{
+			case 1:
+				eulerExp(phi_conv, fc_Curr, dt);
+				break;
+			case 2:
+				itime < 1 ? eulerExp(phi_conv, fc_Curr, dt) : abs2Exp(phi_conv, fc_Curr, fc_Prev, dt);
+				break;
+			default:
+				printf("invalid time-integration scheme.\n");
+				exit(0);
+		}
+		R = id - phi_conv;  // Update resiudal
+		// Solve the linear system Adphi = -R
+		solveGS(dphi, A, R);
+		// Update the solution
+		phi = phi + dphi;
+		// Compute residual 
+		computeDiffusion(id, phi, G, alpha);
+		R = id - phi_conv;
+		applyBC(R, phi, G, u, v, alpha);
+		double R1 = R.L2Norm();
+
+		printf("Time-Step = %d\n",++itime); 
+		printf("Residual Norm = %14.12e,\n Residual Norm Ratio (R/R0) = %14.12e\n", R1, R1/R0);
+
+		//Check convergence
+		if(dphi.L2Norm() < 1e-8)
+		{
+			printf("Steady state reached in %d time steps.\n Final time = %lf.\n",itime,itime*dt);
+			break;
+		}
+		// Compute R
+	}
+	char fname[20] = "Phi_2.vtk";
+	storeVTKStructured(phi, G, fname);
 }
 
 
@@ -315,9 +487,9 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 int main()
 {
 	// method and problem
-	unsigned short conScheme = 3;
+	unsigned short conScheme = 2;
 	unsigned short timeScheme = 2;
-	unsigned short pbtype = 1;
+	unsigned short pbtype = 2;
 
 	switch (conScheme){
 		case 1: std::cout << "First Order Upwind is used" << std::endl; break;
@@ -351,7 +523,7 @@ int main()
 		unsigned long Nx2, Ny2;
 		double xlim2[2] = {0, 1};
 		double ylim2[2] = {0, 1};
-		Nx2 = Ny2 = 101;
+		Nx2 = Ny2 = 17;
 		double tf2 = 2*PI;
 		double dt2 = 0.05*2/200;
 		Grid G2(Nx2,Ny2,xlim2,ylim2);
