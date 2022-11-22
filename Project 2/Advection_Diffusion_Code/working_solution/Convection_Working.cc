@@ -118,7 +118,7 @@ double f1(double x, double y)
 }
 
 
-void InitializePhiCD(Vector &phi, const Grid &G)
+void InitializePhiCD(Vector &phi, Vector &u, Vector &v, const Grid &G, double alpha)
 {
 	const size_t Nx = G.Nx();
 	const size_t Ny = G.Ny();
@@ -126,7 +126,32 @@ void InitializePhiCD(Vector &phi, const Grid &G)
 
 	for(i = 0; i < Nx; i++)
 		for(j = 0; j < Ny; j++)
-			phi(i,j) = f1( G.x(i) , G.y(j) );
+		{
+			// Apply given boundary condition to left and right boundary 
+			if (i == 0)
+			{
+				phi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		
+			}
+			else if (i == (Nx - 1))
+			{
+				phi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+							   		   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+			}
+			// Applt exact solution to top and bottom boundary 
+			else if(j == 0 || j == (Ny - 1))
+			{
+				phi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+				            0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		
+			}
+			// Apply initial condition to internal points
+			else
+			{
+				phi(i,j) = f1( G.x(i) , G.y(j));
+			}
+			
+		}
 }
 
 void InitializeVelCD(Vector &u, Vector &v, const Grid &G)
@@ -138,7 +163,8 @@ void InitializeVelCD(Vector &u, Vector &v, const Grid &G)
 	double x,y;
 
 	for(i = 0; i < Nx; i++)
-		for(j = 0; j < Ny; j++){
+		for(j = 0; j < Ny; j++)
+		{
 			u(i,j) = 1.0;
 			v(i,j) = 0.05;
 		}
@@ -156,7 +182,7 @@ void InitializePhiCD_Exact(const Grid &G, double alpha)
 	Vector v(Nx, Ny);
 	Vector phi(Nx, Ny);
 
-	InitializePhiCD(phi, G);
+	InitializePhiCD(phi, u, v, G, alpha);
 	InitializeVelCD(u, v, G);
 
 	// Solve exact equation
@@ -330,16 +356,16 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		j = 0;
 		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = 0.0;
-		R(i, j) = 0.0; //5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0.0;
+		//5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Top Boundary 
 		j = Ny - 1;
 		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = 0.0;
-		dphi(i, j) = 0.0; // 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0.0;
+		// 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 	// Apply Dirichlet boundary condition to left and right
 	for(j = 0; j < Ny; j++)
@@ -347,9 +373,8 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		// Left boundary
 		i = 0;
 		// Actual Boundary Conditions
-		dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = 0.0;
-		dphi(i, j) = 0;
+		//dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0.0;
 		// Exact solution
 		// R(i, j) = dphi(i, j) = 0.0;
 		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
@@ -357,11 +382,10 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		// Right boundary
 		i = Nx - 1;
 		// Actual Boundary Conditions
-		dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		// dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
 		//R(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = 0.0;
-		dphi(i, j) = 0;
+		R(i, j) = dphi(i, j) = 0.0;
 		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
@@ -457,8 +481,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 
 	//Initialize A, Phi, phi_conv and Vel
 	computeTransientMatrix(A, G, dt);
-	InitializePhiCD(phi, G);
-	InitializePhiCD(phi_conv, G);
+	InitializePhiCD(phi, u, v, G, alpha);
+	InitializePhiCD(phi_conv, u, v, G, alpha);
 	InitializeVelCD(u, v, G);
 
 	// Compute diffusion and residual norm 
