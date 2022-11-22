@@ -325,14 +325,14 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 	{
 		// Bottom Boundary
 		j = 0;
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Top Boundary 
 		j = Ny - 1;
-		//R(i, j) = dphi(i, j) = 0; 
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = dphi(i, j) = 0; 
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 	// Apply Dirichlet boundary condition to left and right
 	for(j = 0; j < Ny; j++)
@@ -340,19 +340,19 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		// Left boundary
 		i = 0;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
+		R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
 		//R(i, j) = dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Right boundary
 		i = Nx - 1;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
+		R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
 		//R(i, j) = dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 }
 
