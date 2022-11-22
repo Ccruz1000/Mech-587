@@ -613,7 +613,7 @@ int main()
 		double ylim2[2] = {0, 1};
 		Nx2 = Ny2 = 17;
 		// Define Problem
-		double tf2 = 2 * 3.1315;
+		double tf2 = 2 * 3.115;
 		//double tf2 = 2.0*3.1416;
 		//double tf2 = 0.05/200;
 		double dt2 = 0.05/200.0;
