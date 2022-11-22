@@ -111,8 +111,10 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G)
 		}
 }
 
-double f1(double x, double y){
-	return 1.0 * exp(-1500 * ((x - 0.5) * (x - 0.5) + (y - 0.5) * (y - 0.5)));
+double f1(double x, double y)
+{	double xpow = x - 0.5;
+	double ypow = y - 0.5;
+	return 1.0 * exp(-1500 * ((xpow * xpow) + (ypow * ypow)));
 }
 
 
@@ -124,7 +126,7 @@ void InitializePhiCD(Vector &phi, const Grid &G)
 
 	for(i = 0; i < Nx; i++)
 		for(j = 0; j < Ny; j++)
-			phi(i,j) = f1(G.x(i) , G.y(j));
+			phi(i,j) = f1( G.x(i) , G.y(j) );
 }
 
 void InitializeVelCD(Vector &u, Vector &v, const Grid &G)
@@ -207,7 +209,7 @@ void CDS2(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, 
 		for(j = 1; j < G.Ny() - 1; j++)
 		{
 			fc_Curr(i, j) = (0.5 * u(i, j) / dx) * (phi(i + 1, j) - phi(i - 1, j)) +
-							(0.5 * v(i, j) / dx) * (phi(i, j + 1) - phi(i, j - 1));
+								(0.5 * v(i, j) / dx) * (phi(i, j + 1) - phi(i, j - 1));
 		}
 }
 
@@ -311,7 +313,8 @@ void computeDiffusion(Vector &R, const Vector &phi, const Grid &G, double alpha)
 	for(i = 1; i < Nx-1; i++)
 		for(j = 1; j < Ny-1; j++)
 			// Computed using central differencing method for both X and Y spatial derivative
-			R(i,j) = alpha * (((phi(i-1, j) - (2 * phi(i, j)) + phi(i+1, j)) / (dx * dx)) + ((phi(i, j-1) - (2 * phi(i, j)) + phi(i, j+1)) / (dy * dy)));
+			R(i,j) = alpha * (((phi(i-1, j) - (2 * phi(i, j)) + phi(i + 1, j)) / (dx * dx)) + 
+					 ((phi(i, j-1) - (2 * phi(i, j)) + phi(i, j + 1)) / (dy * dy)));
 
 }
 
@@ -325,13 +328,17 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 	{
 		// Bottom Boundary
 		j = 0;
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = 0.0;
+		R(i, j) = 0.0; //5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Top Boundary 
 		j = Ny - 1;
-		//R(i, j) = dphi(i, j) = 0; 
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = 0.0;
+		dphi(i, j) = 0.0; // 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 	// Apply Dirichlet boundary condition to left and right
@@ -340,19 +347,23 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, doubl
 		// Left boundary
 		i = 0;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
-		//R(i, j) = dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = 0.0;
+		dphi(i, j) = 0;
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		// R(i, j) = dphi(i, j) = 0.0;
+		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Right boundary
 		i = Nx - 1;
 		// Actual Boundary Conditions
-		//R(i, j) = dphi(i, j) = 0;  // Taking partial derivative of constant gives 0 at boundary
-		//R(i, j) = dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Exact solution
-		R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		//R(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		R(i, j) = 0.0;
+		dphi(i, j) = 0;
+		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 }
 
@@ -432,7 +443,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	const size_t Ny = G.Ny();
 	
 	Vector phi(Nx, Ny);
-	//Vector phi_conv(Nx, Ny); // Temporary vector to store convection phi values
+	Vector phi_conv(Nx, Ny); // Temporary vector to store convection phi values
 	Vector u(Nx, Ny);
 	Vector v(Nx, Ny);
 	Matrix A(Nx,Ny); // LHS matrix A
@@ -447,19 +458,18 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	//Initialize A, Phi, phi_conv and Vel
 	computeTransientMatrix(A, G, dt);
 	InitializePhiCD(phi, G);
-	//InitializePhiCD(phi_conv, G);
+	InitializePhiCD(phi_conv, G);
 	InitializeVelCD(u, v, G);
 
 	// Compute diffusion and residual norm 
 	computeDiffusion(id, phi, G, alpha);
-	// Compute c_curr
 	CDS2(fc_Curr, phi, u, v, G);
-	//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;  // Update residual to subtract convective solution
-	R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-	applyBC(R, phi, G, u, v, alpha);
+	R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;  // Update residual to subtract convective solution
+	applyBC(R, dphi, G, u, v, alpha);
 	double R0 = 0.0;
 	R0 = R.L2Norm();
 	printf("Initial Residual Norm %14.12e\n", R0);
+	printf("Original dphi norm %14.12e\n", dphi.L2Norm());
 
 	// Start time loop 
 	int itime = 0;
@@ -468,48 +478,48 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	{
 		// Record previous convection vector 
 		fc_Prev = fc_Curr;
-		// phi_conv = phi;
-
-		//R = id - phi_conv;  // Update resiudal
-		// Solve the linear system Adphi = R
 		solveGS(dphi, A, R);
-		// Update the solution
 		phi = phi + dphi;
+		computeDiffusion(id, phi, G, alpha);
+		CDS2(fc_Curr, phi, u, v, G);
+		//phi_conv = phi;
+
 		// calculate the convection vector at the current time step
-		switch(conScheme)
-		{
-			case 1:
-				FOU(fc_Curr, phi, u, v, G);
-				break;
-			case 2:
-				CDS2(fc_Curr, phi, u, v, G);
-				break;
-			case 3:
-				SOU(fc_Curr, phi, u, v, G);
-				break;
-			default:
-				printf("invalid convection scheme.\n");
-				exit(0);
-		}
+		// switch(conScheme)
+		// {
+		// 	case 1:
+		// 		FOU(fc_Curr, phi, u, v, G);
+		// 		break;
+		// 	case 2:
+		// 		CDS2(fc_Curr, phi, u, v, G);
+		// 		break;
+		// 	case 3:
+		// 		SOU(fc_Curr, phi, u, v, G);
+		// 		break;
+		// 	default:
+		// 		printf("invalid convection scheme.\n");
+		// 		exit(0);
+		// }
 		// switch(timeScheme)
 		// {
 		// 	case 1:
 		// 		eulerExp(phi, fc_Curr, dt);
 		// 		break;
 		// 	case 2:
-		// 		itime < 1 ? eulerExp(phi_conv, fc_Curr, dt) : abs2Exp(phi_conv, fc_Curr, fc_Prev, dt);
+		// 		itime < 1 ? eulerExp(phi, fc_Curr, dt) : abs2Exp(phi, fc_Curr, fc_Prev, dt);
 		// 		break;
 		// 	default:
 		// 		printf("invalid time-integration scheme.\n");
 		// 		exit(0);
 		// }
-		// Compute residual 
-		computeDiffusion(id, phi, G, alpha);
-		//CDS2(fc_Curr, phi, u, v, G);
-		//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
+		//R = id - phi_conv;  // Update resiudal
 		R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
+		// Solve the linear system Adphi = -R
+		// Update the solution
+		// Compute residual 
+		//R = id - phi_conv;
 		//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-		applyBC(R, dphi, G, u, v, alpha);
+		//applyBC(R, dphi, G, u, v, alpha);
 		double R1 = R.L2Norm();
 		//phi_conv = phi;
 		/*
@@ -528,7 +538,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		}
 		// Compute R
 	}
-	char fname[20] = "Phi_2.vtk";
+	char fname[20] = "Phi_2_working.vtk";
 	storeVTKStructured(phi, G, fname);
 }
 
@@ -579,8 +589,10 @@ int main()
 		double ylim2[2] = {0, 1};
 		Nx2 = Ny2 = 17;
 		// Define Problem
-		double tf2 = 2*3.1416;
-		double dt2 = 0.05/200;
+		double tf2 = 2 * 3.1315;
+		//double tf2 = 2.0*3.1416;
+		//double tf2 = 0.05/200;
+		double dt2 = 0.05/200.0;
 		double alpha = 0.1;
 		// Initialize and solve
 		Grid G2(Nx2,Ny2,xlim2,ylim2);
