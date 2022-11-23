@@ -32,7 +32,7 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G);
 double f1(double x, double y);
 /*================================================================================================*/
 
-void InitializePhiCD(Vector &phi, const Grid &G);
+void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &G, double alpha)
 void InitializeVelCD(Vector &u, Vector &v, const Grid &G);
 void InitializePhiCD_Exact(const Grid &G, double alpha);
 
@@ -112,7 +112,8 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G)
 }
 
 double f1(double x, double y)
-{	double xpow = x - 0.5;
+{	
+	double xpow = x - 0.5;
 	double ypow = y - 0.5;
 	return 1.0 * exp(-1500 * ((xpow * xpow) + (ypow * ypow)));
 }
@@ -134,8 +135,7 @@ void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &
 			}
 			else if (i == (Nx - 1))
 			{
-				phi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-							   		   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+				phi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 			}
 			// Apply exact solution to top and bottom boundary 
 			else if(j == 0 || j == (Ny - 1))
@@ -145,9 +145,9 @@ void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &
 		
 			}
 			// Apply initial condition to internal points
-		   else
-		   {
-					phi(i,j) = f1(G.x(i) , G.y(j));
+		    else
+		    {
+				phi(i,j) = f1(G.x(i) , G.y(j));
 			}
 			
 		}
@@ -343,7 +343,7 @@ void computeDiffusion(Vector &R, const Vector &phi, const Grid &G, double alpha)
 
 }
 
-void applyBC(Vector &R, Vector &dphi, const Grid &G, Vector &u, Vector &v, double alpha)
+void applyBC(Vector &R, Vector &dphi, const Grid &G)
 {
 	unsigned long i,j;
 	unsigned long Nx = G.Nx();
@@ -486,7 +486,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	computeDiffusion(id, phi, G, alpha);
 	CDS2(fc_Curr, phi, u, v, G);
 	R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;  // Update residual to subtract convective solution
-	applyBC(R, dphi, G, u, v, alpha);
+	applyBC(R, dphi, G);
 	double R0 = 0.0;
 	R0 = R.L2Norm();
 	printf("Initial Residual Norm %14.12e\n", R0);
@@ -540,7 +540,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		// Compute residual 
 		//R = id - phi_conv;
 		//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-		//applyBC(R, dphi, G, u, v, alpha);
+		applyBC(R, dphi, G);
 		double R1 = R.L2Norm();
 		//phi_conv = phi;
 		/*
@@ -611,7 +611,7 @@ int main()
 		Nx2 = Ny2 = 17;
 		// Define Problem
 		double tf2 = 2 * 3.1415;
-		//double tf2 = 200*0.05/200;
+		//double tf2 = 1*0.05/200;
 		double dt2 = 0.05/200.0;
 		double alpha = 0.1;
 		// Initialize and solve
