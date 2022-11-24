@@ -32,7 +32,7 @@ void InitializeVel(Vector &u, Vector &v, const Grid &G);
 double f1(double x, double y);
 /*================================================================================================*/
 
-void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &G, double alpha)
+void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &G, double alpha);
 void InitializeVelCD(Vector &u, Vector &v, const Grid &G);
 void InitializePhiCD_Exact(const Grid &G, double alpha);
 
@@ -62,7 +62,7 @@ void abs2Exp(Vector &phi, const Vector &fc_Curr, const Vector &fc_Prev, double &
 // Declare functions from project 1 code 
 void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt);
 void computeDiffusion(Vector &R, const Vector &u, const Grid &G);
-void applyBC(Vector &R, Vector &du, const Grid &G);
+void applyBC(Vector &R, Vector &dphi, const Vector &phi, const Vector &v, const Grid &G, double alpha);
 void initializePhie(Vector &phie, const Grid &G);
 
 
@@ -315,8 +315,27 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 
 	for(i = 0; i < Nx; i++)
 		for(int t = 0; t < 5; t++){
-			M(i,0,t) = (t == 2 ? a : b);
-			M(i,Ny-1, t) = (t == 2 ? a : b);
+			if(t == 2)
+			{
+				M(i, 0, t) = (-1 / dy);
+				M(i, Ny - 1, t) = (1 / dy);
+			}
+			else if(t == 3)
+			{
+				M(i, 0, t) = (1 / dy);
+				M(i, Ny - 1, t) = b;  // This point isnt used for the top boundary
+			}
+			else if(t == 1)
+			{
+				M(i, Ny - 1, t) = (-1 / dy);
+				M(i, 0, t) = b;  // This point isnt used for bottom boundary 
+			}
+			else
+			{
+				// Set other points to be 0
+				M(i, 0, t) = b;
+				M(i, Ny - 1, t) = b; 
+			}
 		}
 
 	for(j = 0; j < Ny; j++)
@@ -343,26 +362,33 @@ void computeDiffusion(Vector &R, const Vector &phi, const Grid &G, double alpha)
 
 }
 
-void applyBC(Vector &R, Vector &dphi, const Grid &G)
+void applyBC(Vector &R, Vector &dphi, const Vector &phi, const Vector &v, const Grid &G, double alpha)
 {
 	unsigned long i,j;
 	unsigned long Nx = G.Nx();
 	unsigned long Ny = G.Ny();
+	double dy = G.dy();
+	double h0; // Double to store bottom boundary condition
+	double h1; // Double to store top boundary condition
 	// Apply given exact solution to top and bottom until I can figure out Neuman
 	for(i = 0; i < Nx; i ++)
 	{
 		// Bottom Boundary
 		j = 0;
+		h0 = 0.1 * (-v(i, j) / alpha * (1 - exp(v(i, j) / alpha))); // Applied condition for bottom Neumann boundary 
 		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = dphi(i, j) = 0.0;
+		R(i, j) = h0 - ((phi(i, j + 1) - phi(i, j)) / dy);
+		dphi(i, j) = 0.0;
 		//5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		// Top Boundary 
-		j = Ny - 1;
+		j = (Ny - 1);
 		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		R(i, j) = dphi(i, j) = 0.0;
+		h1 = 0.1 * (-v(i, j) * exp(v(i, j) / alpha) / (alpha * (1 - exp(v(i, j) / alpha)))); // Applied condition for top Neumann boundary
+		R(i, j) = h1 - ((phi(i, j) - phi(i, j - 1)) / dy);
+		dphi(i, j) = 0.0;
 		// 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
 		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
@@ -389,6 +415,29 @@ void applyBC(Vector &R, Vector &dphi, const Grid &G)
 		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 }
+
+void updateBoundaries(Vector &phi,const Vector &v, const Grid &G, double alpha)
+{
+	double dy = G.dy();
+	unsigned long Ny = G.Ny();
+	unsigned long Nx = G.Nx();
+	unsigned long i, j;
+	double h0;
+	double h1;
+
+	for(i = 1; i < Nx - 1; i++)
+	{
+		j = 0;
+		h0 = 0.1 * (-v(i, j) / alpha * (1 - exp(v(i, j) / alpha))); // Prescribed value for Neumann condition on bottom boundary
+		phi(i, j) = phi(i, j + 1) - h0 * dy;
+
+		j = (Ny - 1);
+		h1 = 0.1 * (-v(i, j) * exp(v(i, j) / alpha) / (alpha * (1 - exp(v(i, j) / alpha)))); // Prescribed value for Neumann condition on top boundary
+		phi(i, j) = phi(i, j - 1) - h1 * dy;
+	}
+
+}
+
 
 
 void SolveConvection(const Grid &G, const double tf, double dt, const unsigned short conScheme, const unsigned short timeScheme)
@@ -486,7 +535,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	computeDiffusion(id, phi, G, alpha);
 	CDS2(fc_Curr, phi, u, v, G);
 	R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;  // Update residual to subtract convective solution
-	applyBC(R, dphi, G);
+	applyBC(R, dphi, phi, v, G, alpha);
 	double R0 = 0.0;
 	R0 = R.L2Norm();
 	printf("Initial Residual Norm %14.12e\n", R0);
@@ -501,10 +550,9 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		fc_Prev = fc_Curr;
 		solveGS(dphi, A, R);
 		phi = phi + dphi;
+		updateBoundaries(phi, v, G, alpha);
 		computeDiffusion(id, phi, G, alpha);
 		CDS2(fc_Curr, phi, u, v, G);
-		//phi_conv = phi;
-
 		// calculate the convection vector at the current time step
 		// switch(conScheme)
 		// {
@@ -521,26 +569,13 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 		// 		printf("invalid convection scheme.\n");
 		// 		exit(0);
 		// }
-		// switch(timeScheme)
-		// {
-		// 	case 1:
-		// 		eulerExp(phi, fc_Curr, dt);
-		// 		break;
-		// 	case 2:
-		// 		itime < 1 ? eulerExp(phi, fc_Curr, dt) : abs2Exp(phi, fc_Curr, fc_Prev, dt);
-		// 		break;
-		// 	default:
-		// 		printf("invalid time-integration scheme.\n");
-		// 		exit(0);
-		// }
-		//R = id - phi_conv;  // Update resiudal
 		R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
 		// Solve the linear system Adphi = -R
 		// Update the solution
 		// Compute residual 
 		//R = id - phi_conv;
 		//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-		applyBC(R, dphi, G);
+		applyBC(R, dphi, phi, v, G, alpha);
 		double R1 = R.L2Norm();
 		//phi_conv = phi;
 		/*
