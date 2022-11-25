@@ -453,7 +453,7 @@ void SolveConvection(const Grid &G, const double tf, double dt, const unsigned s
 		}
 	}
 
-	char fname[20] = "Phi.vtk";
+	char fname[40] = "Phi_dt=%14.12e_h=%d.vtk", dt, Nx;
 	storeVTKStructured(phi, G, fname);
 }
 
