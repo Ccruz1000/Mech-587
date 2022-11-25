@@ -138,12 +138,12 @@ void InitializePhiCD(Vector &phi, const Vector &u, const Vector &v, const Grid &
 				phi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 			}
 			// Apply exact solution to top and bottom boundary 
-			else if(j == 0 || j == (Ny - 1))
-			{
-				phi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-				            0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+			// else if(j == 0 || j == (Ny - 1))
+			// {
+			// 	phi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
+			// 	            0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		
-			}
+			// }
 			// Apply initial condition to internal points
 		    else
 		    {
@@ -247,14 +247,12 @@ void SOU(Vector &fc_Curr, const Vector &phi, const Vector &u, const Vector &v, c
 	for(i = 1; i < G.Nx() - 1; i++)
 		for(j = 1; j < G.Ny() - 1; j++)
 		{	
-			
 			// Central Difference for points near boundary
 			if(i == 1 || i == G.Nx() - 2 || j == 1 || j == G.Ny() - 2)
 			{
 				fc_Curr(i, j) = (0.5 * u(i, j) / dx) * (phi(i + 1, j) - phi(i - 1, j)) +
 								(0.5 * v(i, j) / dx) * (phi(i, j + 1) - phi(i, j - 1));
 			}
-
 			// Second Order Upwind for Interior Points
 			else
 			{
@@ -317,16 +315,19 @@ void computeTransientMatrix(Matrix &M, const Grid &G, const double &dt)
 		for(int t = 0; t < 5; t++){
 			if(t == 2)
 			{
+				// Update A matrix for points we are updating
 				M(i, 0, t) = (-1 / dy);
 				M(i, Ny - 1, t) = (1 / dy);
 			}
 			else if(t == 3)
 			{
+				// Update A matrix for j + 1 points 
 				M(i, 0, t) = (1 / dy);
 				M(i, Ny - 1, t) = b;  // This point isnt used for the top boundary
 			}
 			else if(t == 1)
 			{
+				// Update A matrix for j - 1 points
 				M(i, Ny - 1, t) = (-1 / dy);
 				M(i, 0, t) = b;  // This point isnt used for bottom boundary 
 			}
@@ -370,49 +371,28 @@ void applyBC(Vector &R, Vector &dphi, const Vector &phi, const Vector &v, const 
 	double dy = G.dy();
 	double h0; // Double to store bottom boundary condition
 	double h1; // Double to store top boundary condition
-	// Apply given exact solution to top and bottom until I can figure out Neuman
 	for(i = 0; i < Nx; i ++)
 	{
-		// Bottom Boundary
+		// Applying Neumann boundary condition to the bottom boundary
 		j = 0;
-		h0 = 0.1 * (-v(i, j) / alpha * (1 - exp(v(i, j) / alpha))); // Applied condition for bottom Neumann boundary 
-		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
+		h0 = 0.1 * (-v(i, j) / alpha * (1 - exp(v(i, j) / alpha)));
 		R(i, j) = h0 - ((phi(i, j + 1) - phi(i, j)) / dy);
 		dphi(i, j) = 0.0;
-		//5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		// Top Boundary 
+		// Apply Neumann bounday condition to the top Boundary 
 		j = (Ny - 1);
-		//R(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		// 				0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		h1 = 0.1 * (-v(i, j) * exp(v(i, j) / alpha) / (alpha * (1 - exp(v(i, j) / alpha)))); // Applied condition for top Neumann boundary
+		h1 = 0.1 * (-v(i, j) * exp(v(i, j) / alpha) / (alpha * (1 - exp(v(i, j) / alpha))));
 		R(i, j) = h1 - ((phi(i, j) - phi(i, j - 1)) / dy);
 		dphi(i, j) = 0.0;
-		// 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		//					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 	// Apply Dirichlet boundary condition to left and right
 	for(j = 0; j < Ny; j++)
 	{
-		// Left boundary
+		// Apply Dirichlet bboundary condition to the left boundary 
 		i = 0;
-		// Actual Boundary Conditions
-		//dphi(i, j) = 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		R(i, j) = dphi(i, j) = 0.0;
-		// Exact solution
-		// R(i, j) = dphi(i, j) = 0.0;
-		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		// Right boundary
+		// Apply Dirichlet boundary condition to the right boundary 
 		i = Nx - 1;
-		// Actual Boundary Conditions
-		// dphi(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
-		// Exact solution
-		//R(i, j) = 5.0 + 0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 		R(i, j) = dphi(i, j) = 0.0;
-		// R(i, j) = dphi(i, j) = 5.0 * ((1 - exp(G.x(i) * u(i, j) / alpha)) / (1 - exp(u(i, j) / alpha))) + 
-		// 					   0.1 * ((1 - exp(G.y(j) * v(i, j) / alpha)) / (1 - exp(v(i, j) / alpha)));
 	}
 }
 
@@ -435,7 +415,6 @@ void updateBoundaries(Vector &phi,const Vector &v, const Grid &G, double alpha)
 		h1 = 0.1 * (-v(i, j) * exp(v(i, j) / alpha) / (alpha * (1 - exp(v(i, j) / alpha)))); // Prescribed value for Neumann condition on top boundary
 		phi(i, j) = phi(i, j - 1) - h1 * dy;
 	}
-
 }
 
 
@@ -548,43 +527,30 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	{
 		// Record previous convection vector 
 		fc_Prev = fc_Curr;
-		solveGS(dphi, A, R);
-		phi = phi + dphi;
-		updateBoundaries(phi, v, G, alpha);
-		computeDiffusion(id, phi, G, alpha);
-		CDS2(fc_Curr, phi, u, v, G);
+		solveGS(dphi, A, R);  // Solve Adphi = R
+		phi = phi + dphi;  // Update phi
+		updateBoundaries(phi, v, G, alpha);  // Re initialize phi points based on Neuman condition - they were overwritten in last line 
+		computeDiffusion(id, phi, G, alpha);  // Solve for diffusion residual 
 		// calculate the convection vector at the current time step
-		// switch(conScheme)
-		// {
-		// 	case 1:
-		// 		FOU(fc_Curr, phi, u, v, G);
-		// 		break;
-		// 	case 2:
-		// 		CDS2(fc_Curr, phi, u, v, G);
-		// 		break;
-		// 	case 3:
-		// 		SOU(fc_Curr, phi, u, v, G);
-		// 		break;
-		// 	default:
-		// 		printf("invalid convection scheme.\n");
-		// 		exit(0);
-		// }
-		R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-		// Solve the linear system Adphi = -R
-		// Update the solution
-		// Compute residual 
-		//R = id - phi_conv;
-		//R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;
-		applyBC(R, dphi, phi, v, G, alpha);
-		double R1 = R.L2Norm();
-		//phi_conv = phi;
-		/*
-		FINALLY FOUND BUG! phi_conv is never updated, and therefore we arent updating as we timestep.
-		Find a way to update phi_conv properly, and easy fix!!
-		*/
-
+		switch(conScheme)
+		{
+			case 1:
+				FOU(fc_Curr, phi, u, v, G);
+				break;
+			case 2:
+				CDS2(fc_Curr, phi, u, v, G);
+				break;
+			case 3:
+				SOU(fc_Curr, phi, u, v, G);
+				break;
+			default:
+				printf("invalid convection scheme.\n");
+				exit(0);
+		}
+		R = id - 1.5 * fc_Curr + 0.5 * fc_Prev;  // Update residual to include convection terms
+		applyBC(R, dphi, phi, v, G, alpha); // Apply boundary conditions 
+		double R1 = R.L2Norm();  // Calculate R1 to find residual norm 
 		printf("Time-Step = %d\n",++itime); 
-		//printf("Residual Norm = %14.12e,\n Residual Norm Ratio (R/R0) = %14.12e\n", R1, R1/R0);
 		printf("Convergence Criteria %12.12e\n Current Time = %lf\n", dphi.L2Norm(), itime*dt);
 		//Check convergence
 		if(dphi.L2Norm() < 1e-8)
@@ -592,7 +558,6 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 			printf("Steady state reached in %d time steps.\n Final time = %lf.\n",itime,itime*dt);
 			break;
 		}
-		// Compute R
 	}
 	char fname[20] = "Phi_2_working.vtk";
 	storeVTKStructured(phi, G, fname);
@@ -647,7 +612,7 @@ int main()
 		// Define Problem
 		double tf2 = 2 * 3.1415;
 		//double tf2 = 1*0.05/200;
-		double dt2 = 0.05/200.0;
+		double dt2 = 0.05/(Nx2 - 1);
 		double alpha = 0.1;
 		// Initialize and solve
 		Grid G2(Nx2,Ny2,xlim2,ylim2);
