@@ -1,6 +1,6 @@
 #include "NSDriver.h"
 
-double test = 0.0001;
+double test = 0.0;
 /*========================================================================================
  * The entire code is written as a class, which takes the input from the NS.inp
  * If you have completed the code correctly, the current set of parameters should give you
@@ -71,7 +71,7 @@ void NSDriver::Run()
 	unsigned long itime = 0;
 	unsigned long k = 0;
 	char fileName[50] = "solution_0.vtk";
-
+	std::cout << std::endl << std::endl << std::endl << Params.Re << std::endl << std::endl << std::endl;
 	initializeVel();
 	initializePres();
 
