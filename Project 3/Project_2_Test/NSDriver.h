@@ -49,8 +49,8 @@ class NSDriver
 	Vector Fdu, Fdv;
 
 	void assembleA(char flowVar);
-	// void assembleb0(char flowVar);
-	void assembleb0(char flowVar,const Vector &Fc, const Vector &Fc_,const Vector &Fd, const Vector &vel, unsigned long itime);
+	void assembleb0(char flowVar);
+	//void assembleb0(char flowVar,const Vector &Fc, const Vector &Fc_,const Vector &Fd, const Vector &vel, unsigned long itime);
 	void applyMomBC(char flowVar);
 
 	void assembleFaceVel();

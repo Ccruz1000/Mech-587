@@ -1,6 +1,5 @@
 #include "NSDriver.h"
 
-double test = 0.0;
 /*========================================================================================
  * The entire code is written as a class, which takes the input from the NS.inp
  * If you have completed the code correctly, the current set of parameters should give you
@@ -18,6 +17,16 @@ double test = 0.0;
  * we've updated the linear solver. Now you can solve Ax=b by S.solve(x, A, b);
  *========================================================================================
  */ 
+/* 
+Vector Uses
+u - u solution vector u* in notes
+v - v solution vector v* in notes
+p - p solution vector 
+u_ - u velocity predictor 
+v_ - v velocity predictor
+p_ - p velocity predictor
+
+*/
 
 
 NSParameters::NSParameters():	dt(Config::Instance()->dt()),
@@ -46,16 +55,30 @@ NSDriver::~NSDriver()
 
 void NSDriver::initializeVel()
 {
-	for(size_t i = 0; i < G.Nx(); i++)
-		for(size_t j = 0; j < G.Ny(); j++){
-			u(i,j) = 0;
-			v(i,j) = 0;
-		}
+	// Set up for project 2
+	unsigned long i, j;
+	double x, y;
+	const unsigned long Nx = G.Nx();
+	const unsigned long Ny = G.Ny();
+	const double dx = G.dx();
+	const double dy = G.dy();
 
-	for(size_t i = 0; i < G.Nx(); i++){
-		u(i,0) = 0;
-		u(i,G.Ny()-1) = 1;
-	}
+	for (i = 0; i < Nx; i ++)
+		for(j = 0; j < Ny; j++)
+		{
+			u(i, j) = 1.0;
+			v(i, j) = 0.05;
+		}
+	// for(size_t i = 0; i < G.Nx(); i++)
+	// 	for(size_t j = 0; j < G.Ny(); j++){
+	// 		u(i,j) = 0;
+	// 		v(i,j) = 0;
+	// 	}
+
+	// for(size_t i = 0; i < G.Nx(); i++){
+	// 	u(i,0) = 0;
+	// 	u(i,G.Ny()-1) = 1;
+	// }
 }
 
 void NSDriver::initializePres()
@@ -71,7 +94,7 @@ void NSDriver::Run()
 	unsigned long itime = 0;
 	unsigned long k = 0;
 	char fileName[50] = "solution_0.vtk";
-	std::cout << std::endl << std::endl << std::endl << Params.Re << std::endl << std::endl << std::endl;
+
 	initializeVel();
 	initializePres();
 
@@ -314,7 +337,6 @@ void NSDriver::assembleA(char flowVar)
 
 void NSDriver::assembleAp()
 {
-	//TODO ADD COMPUTE TRANSIENT MATRIX AND COMPUTE RESIDUAL FROM PROJECT 2 TO HERE AND ASSEMBLEBP
 	double dx, dy;
 	dx = G.dx(), dy = G.dy();
 	size_t Nx, Ny;
@@ -328,11 +350,11 @@ void NSDriver::assembleAp()
 		// Copy the right value to the following five lines.
 		// For solving NS equation, changing the rest of the code is not recommended.
 		
-			Ap(1,j,0) = test;
-			Ap(1,j,1) = test;
-			Ap(1,j,2) = test;
-			Ap(1,j,3) = test;
-			Ap(1,j,4) = test;
+			Ap(1,j,0) = 0;
+			Ap(1,j,1) = 0;
+			Ap(1,j,2) = 0;
+			Ap(1,j,3) = 0;
+			Ap(1,j,4) = 0;
 		}
 	}
 	for (size_t j = 2; j < Ny-2; j++){
@@ -543,7 +565,7 @@ void NSDriver::assemblebp()
 			// For solving NS equation, changing the rest of the code is not recommended.
 			// use ww for p(i-2,j), use ee for p(i+2,j)
 			// use nn for p(i,j+2), use ss for p(i,j-2)  
-			bp(i,j) = test;
+			bp(i,j) = 0 ;
 
 		}
 	}

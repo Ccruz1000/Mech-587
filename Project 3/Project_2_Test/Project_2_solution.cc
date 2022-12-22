@@ -503,7 +503,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	while(time < tf)
 	{   
         fc_Prev = fc_Curr;
-
+        //S.solve(dphi, A, R);
         solveGS(dphi,A,R);
 		phi = phi + dphi;
 

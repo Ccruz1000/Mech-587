@@ -1,8 +1,8 @@
 Nx 65
 Ny 65
 dt 0.01
-Re 1000 // Originally 100
-nTimeSteps 50 // Originally 500
+Re 100
+nTimeSteps 500
 alphaP 0.7
 alphaU 1
 conv 5e-4
