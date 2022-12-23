@@ -487,6 +487,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	Vector id(Nx,Ny);
 
     computeTransientMatrix(A, G, dt);
+    char fileName[50] = "solution_0.vtk";
+    storeVTKStructured(phi, G, fileName);
 
     //Compute Residual and Residual norm
 	double R0 = 0.0;
@@ -535,6 +537,11 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 
 		if(last)
 			break;
+		if((itime + 1) % 10 == 0)
+		{
+			sprintf(fileName, "solution_%lu.vtk", itime + 1);
+			storeVTKStructured(phi, G, fileName);
+		}
 
 		//Check convergence
 		if(dphi.L2Norm() < 1e-8){
@@ -566,7 +573,7 @@ int main()
 {
 	
 	unsigned short conScheme = 2;
-	unsigned short timeScheme = 1;
+	unsigned short timeScheme = 2;
 	unsigned short pbtype = 2;
 
 	switch (conScheme){

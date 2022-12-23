@@ -38,7 +38,6 @@ class Matrix;
 void solveGS(Vector &u, const Matrix &A, const Vector &b);
 void solve(Vector&u, const Matrix &A, const Vector&b);
 void storeVTKStructured(const Vector &u, const Grid &G, const char *fileName);
-void storeVTKSolution(const Vector &u, const Vector &v, const Vector &p, const Grid &G, const char *fileName);
 
 
 // Wrap all these functions in a utils class, and call them through the Utils object

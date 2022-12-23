@@ -497,9 +497,10 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 	applyBC(R,dphi,G, phi);
 	R0 = R.L2Norm();
 	printf("Initial Residual Norm = %14.12e\n", R0);
+	char fileName[50] = "solution_0.vtk";
+    storeVTKStructured(phi, G, fileName);
 
-
-    int itime = 0; double time = 0.0; bool last = false;
+    unsigned long itime = 0; double time = 0.0; bool last = false;
 	while(time < tf)
 	{   
         fc_Prev = fc_Curr;
@@ -534,10 +535,15 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt, const u
 
 		if(last)
 			break;
+		if((itime + 1) % 1 == 0)
+		{
+			sprintf(fileName, "solution_%lu.vtk", itime + 1);
+			storeVTKStructured(phi, G, fileName);
+		}
 
 		//Check convergence
 		if(dphi.L2Norm() < 1e-8){
-			printf("Steady state reached in %d time steps.\n Final time = %lf.\n",itime,itime*dt);
+			printf("Steady state reached in %lu time steps.\n Final time = %lf.\n",itime,itime*dt);
 			break;
 		}
 

@@ -538,8 +538,8 @@ void solveGS(Vector &u, const Matrix &A, const Vector &b)
 		// printf("%d %14.12e\n",iter,L2Norm);
 		if(L2Norm < 1e-8 || iter > 50000)
 		{
-			printf("Gauss Seidel Iterations converged\n");
-			printf("iterations = %d, Error Residuals = %14.12e\n",iter,L2Norm);
+			//printf("Gauss Seidel Iterations converged\n");
+			//printf("iterations = %d, Error Residuals = %14.12e\n",iter,L2Norm);
 			break;
 		}
 	}
@@ -575,40 +575,6 @@ void storeVTKStructured(const Vector &u, const Grid &G, const char *fileName)
 	for(i= 0; i < Nx; i++)
 		for(j = 0; j < Ny; j++)
 			fprintf(vtkFile,"%14.12lf\n",u(i,j));
-
-	fclose(vtkFile);
-}
-
-void storeVTKSolution(const Vector &u, const Vector &v, const Vector &p, const Grid &G, const char *fileName) 
-{;
-	FILE *vtkFile;
-	vtkFile = fopen(fileName,"w");
-	unsigned long i,j;
-	unsigned long Nx, Ny;
-	Nx = G.Nx(), Ny = G.Ny();
-
-	fprintf(vtkFile,"# vtk DataFile Version 2.0\n");
-	fprintf(vtkFile,"TITLE = \"Quad data\"\n");
-	fprintf(vtkFile,"ASCII\n");
-	fprintf(vtkFile,"DATASET STRUCTURED_GRID\n");
-	fprintf(vtkFile,"DIMENSIONS %lu %lu %d\n", Nx, Ny, 1);
-	fprintf(vtkFile,"POINTS %lu FLOAT\n",Nx*Ny);
-	for(j = 0; j < Ny; j++)
-		for(i = 0; i < Nx; i++){
-			fprintf(vtkFile, "%f %f %f\n",G.x(i), G.y(j), 0.0);
-		}
-
-	fprintf(vtkFile,"POINT_DATA %lu\n",Nx*Ny);
-	fprintf(vtkFile,"SCALARS pressure FLOAT 1\n");
-	fprintf(vtkFile,"LOOKUP_TABLE default\n");
-	for(j= 0; j < Ny; j++)
-		for(i = 0; i < Nx; i++)
-			fprintf(vtkFile,"%lf\n",p(i,j));
-
-	fprintf(vtkFile,"VECTORS velocity FLOAT\n");
-	for(j= 0; j < Ny; j++)
-		for(i = 0; i < Nx; i++)
-			fprintf(vtkFile,"%lf %lf %lf\n",u(i,j),v(i,j),0.0);
 
 	fclose(vtkFile);
 }
