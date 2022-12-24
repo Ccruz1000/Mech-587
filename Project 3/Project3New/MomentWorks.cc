@@ -8,8 +8,8 @@
 
 // Input variables
 double dt = 0.1;
-unsigned long Re = 2;
-unsigned long Nstep = 33;
+unsigned long Re = 10;
+unsigned long Nstep = 65;
 unsigned long Nx = Nstep;
 unsigned long Ny = Nstep;
 unsigned long nTimeSteps = 500;
@@ -441,9 +441,12 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt)
 	}
 
 	// Calculate L2 Error
-	Vector e(Nx, Ny);
-	e = VelX - phi_exact;
-	printf("L2 error = %14.12e\n", e.L2Norm());
+	Vector ex(Nx, Ny);
+	Vector ey(Nx, Ny);
+	ex = VelX - phi_exact;
+	ey = VelY - phi_exact;
+	printf("L2x error = %14.12e\n", ex.L2Norm());
+	printf("L2y error = %14.14e\n", ey.L2Norm());
 }
 
 int main()

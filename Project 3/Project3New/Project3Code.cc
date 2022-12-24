@@ -440,14 +440,13 @@ void applyBC2(Vector &R, Vector &dphi, const Grid &G, const Vector &phi)
 }
 
 // Solve steady laplace equation for project 1
-const Vector solveSteadyLaplace(const Grid &G)
+const Vector solveSteadyLaplace(const Grid &G, Vector &u)
 {
 	unsigned long Nx, Ny;
 	Nx = G.Nx(), Ny = G.Ny();
 
 	Matrix A(Nx,Ny);
 	Vector R(Nx,Ny);
-	Vector u(Nx,Ny);
 	Vector du(Nx,Ny);
 	
 	//Initialize timing variables
@@ -523,6 +522,8 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt)
 	Vector gradpx(Nx, Ny); // Gradient of pressure w.r.t X
 	Vector py(Nx, Ny); // Pressure = Y
 	Vector gradpy(Nx, Ny); // Gradient of pressure w.r.t. y
+	Vector p_sol(Nx, Ny); // Vector to test using project 1
+	solveSteadyLaplace(G, p_sol);
 	InitializeVelCD(u_conv,v_conv,G); // Initialize Convective velocity
 	InitializePressure(px, py, G); // Initialize pressure for part 1
 	CalcGradPressure(gradpx, gradpy, px, py, G); // Calculate Pressure Gradient
@@ -536,7 +537,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt)
 	char gradpyvtkfile[30] = "GradyP=Y.vtk";
 	storeVTKStructured(gradpy, G, gradpyvtkfile);
 	char fname1[30] = "Init_Conv.vtk";
-	storeVTKSolution(u_conv, v_conv, py, G, fname1);
+	storeVTKSolution(u_conv, v_conv, p_sol, G, fname1);
 
 	/**********************************************
 	 Declare variables and begin solving for 
@@ -589,7 +590,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt)
 	printf("Initial Y Residual Norm = %14.12e\n", R0Y);
 
 	char fileName[50] = "solution_0.vtk";
-	storeVTKSolution(VelX, VelY, py, G, fileName);
+	storeVTKSolution(VelX, VelY, p_sol, G, fileName);
 
 
     unsigned long itime = 0; double time = 0.0; bool last = false;
@@ -650,7 +651,7 @@ void SolveConvectionDiffusion(const Grid &G, const double tf, double dt)
 		if((itime + 1) % 10 == 0)
 		{
 			sprintf(fileName, "solution_%lu.vtk", itime + 1);
-			storeVTKSolution(VelX, VelY, py, G, fileName);
+			storeVTKSolution(VelX, VelY, p_sol, G, fileName);
 		}
 
 		//Check convergence
@@ -676,16 +677,6 @@ int main()
 	double xlim[2] = {0, 1};
 	double ylim[2] = {0, 1};
 	Grid G2(Nx, Ny, xlim, ylim);
-	int method = 2;
-
-	if(method == 1)
-		{
-			solveSteadyLaplace(G2);
-		}
-	else if(method == 2)
-		{
-			double tf = nTimeSteps * dt;
-			std::cout << "method\n";
-			SolveConvectionDiffusion(G2, tf, dt);
-		}
+	double tf = nTimeSteps * dt;
+	SolveConvectionDiffusion(G2, tf, dt);
 }
