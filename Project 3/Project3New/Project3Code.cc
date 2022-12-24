@@ -8,8 +8,8 @@
 
 // Input variables
 double dt = 0.1;
-unsigned long Re = 2;
-unsigned long Nstep = 33;
+unsigned long Re = 10;
+unsigned long Nstep = 65;
 unsigned long Nx = Nstep;
 unsigned long Ny = Nstep;
 unsigned long nTimeSteps = 500;
@@ -24,6 +24,23 @@ double f2_proj1(double x, double y)
 	return exp(-100*(pow(x,2) + pow(y,2)));
 }
 
+// Exact solution for project 2
+void initializeUe(Vector &ue, const Grid &G)
+{
+	unsigned long i,j;
+	double x, y;
+
+	const unsigned long Nx = G.Nx();
+	const unsigned long Ny = G.Ny();
+	const double dx = G.dx();
+	const double dy = G.dy();
+
+	for(i = 0; i < Nx; i++)
+		for(j = 0; j < Ny; j++){
+			x = i*dx, y=j*dy;
+			ue(i,j) = f(x,y);
+		}
+}
 
 // Initial velocity for project 2
 double f1(double x, double y)
@@ -447,6 +464,7 @@ const Vector solveSteadyLaplace(const Grid &G, Vector &u)
 
 	Matrix A(Nx,Ny);
 	Vector R(Nx,Ny);
+	Vector ue(Nx,Ny);
 	Vector du(Nx,Ny);
 	
 	//Initialize timing variables
@@ -455,6 +473,7 @@ const Vector solveSteadyLaplace(const Grid &G, Vector &u)
 
 	//Initialize A,b,u,du,ue
 	initializeU(u, G);
+	initializeUe(ue, G);
 	computeMatrix(A, G);
 	char matName[20] = "SteadyA.dat";
 	A.storeA(matName);
@@ -494,6 +513,9 @@ const Vector solveSteadyLaplace(const Grid &G, Vector &u)
 		if(R1/R0 < 1e-5)
 			break;
 	}
+	Vector e(Nx, Ny);
+	e = u - ue;
+	printf("L2 Error of %14.12e\n", e.L2Norm());
 
 	steady_duration = (clock() - steady_start) / (double) CLOCKS_PER_SEC;
 	printf("Steady-state Solution time = %14.12e\n", steady_duration);
@@ -676,7 +698,9 @@ int main()
 {
 	double xlim[2] = {0, 1};
 	double ylim[2] = {0, 1};
+	Vector u(Nx,Ny);
 	Grid G2(Nx, Ny, xlim, ylim);
 	double tf = nTimeSteps * dt;
-	SolveConvectionDiffusion(G2, tf, dt);
+	//SolveConvectionDiffusion(G2, tf, dt);
+	solveSteadyLaplace(G2, u);
 }
