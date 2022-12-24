@@ -7,8 +7,8 @@ grid = [1/16, 1/32, 1/64]
 
 slopex = (math.log(L2X[-1]) - math.log(L2X[0])) / (math.log(grid[-1]) - math.log(grid[0]))
 slopey = (math.log(L2Y[-1]) - math.log(L2Y[0])) / (math.log(grid[-1]) - math.log(grid[0]))
-print("X Error is equal to " + str(slopex))
-print("Y Error is equal to " + str(slopey))
+print("X Order of Accuracy is equal to " + str(slopex))
+print("Y Order of Accuracy is equal to " + str(slopey))
 plt.loglog(grid, L2X, label='L2X Norm Vs. Grid Size')
 plt.loglog(grid, L2Y, label='L2Y Norm Vs. Grid Size')
 plt.grid(which='both')
